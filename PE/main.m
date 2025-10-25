@@ -4,7 +4,6 @@ rng(124)
 
 % ins_mode = 0;
 
-
 mkdir("Figs")
 %% simulation time parameters
 
@@ -21,6 +20,7 @@ max_iteration = max_time_horizon / step_time + 1;
 simulation_time = zeros (max_episode , 1);
 
 max_repo_member = 20;
+
 %% game parameters
 
 dimension = 50;
