@@ -4,7 +4,7 @@ number_of_rules = numel (actor);
 
 actor_weights = zeros (number_of_rules , 3);
 
-angle_list = linspace (0 , pi/8 , 3);
+angle_list = linspace (0 , pi/2 , 10);
 
 for rule = 1 : number_of_rules
 

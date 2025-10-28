@@ -14,6 +14,4 @@ for i=1:n
     end
 end
 
-% R(B==C) = 1;
-
 Q_value(R==1,:)=[];

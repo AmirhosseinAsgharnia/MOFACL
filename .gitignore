@@ -4,6 +4,7 @@
 *.autosave
 *.slx.r*
 *.mdl.r*
+*.mat
 
 # Derived content-obscured files
 *.p
@@ -38,3 +39,7 @@ codegen/
 # SimBiology backup files
 *.sbproj.backup
 *.sbproj.bak
+
+Figs/
+!*/        # optional to keep other folders
+PE/Figs/*.png

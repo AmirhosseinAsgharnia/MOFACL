@@ -50,8 +50,8 @@ V2_S1 = V2 - origin;
 % plot(V1(1),V1(2),"xk")
 % plot(V2(1),V2(2),"xk")
 
-V1_S2 =  R_passive * V1_S1;
-V2_S2 =  R_passive * V2_S1;
+V1_S2 =  R_passive * V1_S1';
+V2_S2 =  R_passive * V2_S1';
 
 %%
 
