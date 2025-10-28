@@ -93,13 +93,9 @@ critic.members =0 * ones ( max_repo_member , number_of_objectives);
 
 critic.minimum_members = 0*ones ( 1 , number_of_objectives);
 
-critic.index = repmat((1:number_of_angle)' , max_repo_member/number_of_angle , 1);
-
 critic.pareto = 0 * ones ( max_repo_member , number_of_objectives);
 
 critic.minimum_pareto = 0*ones ( 1 , number_of_objectives);
-
-critic.pareto_index = repmat((1:number_of_angle)' , max_repo_member/number_of_angle , 1);
 
 critic.selected = 1;
 
@@ -108,8 +104,6 @@ critic = repmat (critic , number_of_rules , 1);
 %% actor spaces
 
 actor.members = 0 * ones ( max_repo_member , 1);
-
-actor.index = repmat((1:number_of_angle)' , max_repo_member/number_of_angle , 1);
 
 actor.pareto = 0 * ones ( max_repo_member , 1);
 
