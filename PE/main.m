@@ -47,7 +47,7 @@ critic_learning_rate = 0.2;
 
 discount_factor = 0.5;
 
-number_of_angle = 10;
+number_of_angle = 3;
 
 max_repo_member = 10;
 
@@ -156,17 +156,15 @@ for episode = 1 : max_episode
 
         for rule = active_rules_1.act'
 
-            Select_indices = find (critic(rule).index == angle);
+            Distances = distance_from_vector( angle_list(angle), critic(rule).minimum_members , critic(rule).members );
 
-            Distances = distance_from_vector( angle_list(angle), critic(rule).minimum_members , critic(rule).members(Select_indices , :) );
-
-            % if rand < epsilon
-            %     select = randi([1 numel(Select_indices)]);
-            % else
+            if rand < epsilon
+                select = randi([1 numel(Distances)]);
+            else
                 [~ , select] = min (Distances);
-            % end
+            end
 
-            critic(rule).selected = Select_indices (select);
+            critic(rule).selected = select;
 
             actor_output_parameters(rule) = actor(rule).members (critic(rule).selected);
 
@@ -232,22 +230,26 @@ for episode = 1 : max_episode
 
         %% calculating v_{t+1}
 
-        matrix_G = G_extractor (critic , active_rules_2 , angle , angle_list);
+        matrix_G = G_extractor (critic , active_rules_2 , angle_list);
 
-        V_s_2 = zeros (1 , 2);
+        V_s_2 = zeros (number_of_angle , 2);
 
-        Fuzzy_critic.weights = zeros (number_of_rules , 1);
+        for i = 1:number_of_angle
 
-        Fuzzy_critic.weights(active_rules_2.act , 1) = matrix_G (: , 1);
+            Fuzzy_critic.weights = zeros (number_of_rules , 1);
 
-        V_s_2 (1) = fuzzy_engine_3 ( [position_agent(iteration + 1, 1) , position_agent(iteration + 1 , 2) , position_agent(iteration + 1 , 3)] , Fuzzy_critic ).res;
+            Fuzzy_critic.weights(active_rules_2.act , 1) = matrix_G (: , 1 , i);
 
-        Fuzzy_critic.weights = zeros (number_of_rules , 1);
+            V_s_2 (i , 1) = fuzzy_engine_3 ( [position_agent(iteration + 1, 1) , position_agent(iteration + 1 , 2) , position_agent(iteration + 1 , 3)] , Fuzzy_critic ).res;
 
-        Fuzzy_critic.weights(active_rules_2.act , 1) = matrix_G (: , 2);
+            Fuzzy_critic.weights = zeros (number_of_rules , 1);
 
-        V_s_2 (2) = fuzzy_engine_3 ( [position_agent(iteration + 1, 1) , position_agent(iteration + 1 , 2) , position_agent(iteration + 1 , 3)] , Fuzzy_critic ).res;
+            Fuzzy_critic.weights(active_rules_2.act , 1) = matrix_G (: , 2 , i);
 
+            V_s_2 (i , 2) = fuzzy_engine_3 ( [position_agent(iteration + 1, 1) , position_agent(iteration + 1 , 2) , position_agent(iteration + 1 , 3)] , Fuzzy_critic ).res;
+        
+        end
+        
         if terminate
             V_s_2 = V_s_2 * 0;
         end
@@ -292,6 +294,7 @@ for episode = 1 : max_episode
             actor(rule).pareto = actor(rule).members;
 
             actor(rule).pareto(R==1) = [];
+
         end
 
     end
