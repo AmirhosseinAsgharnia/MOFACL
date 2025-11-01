@@ -283,6 +283,7 @@ for episode = 1 : max_episode
             end
 
             [critic , actor] = pareto_synthesizer (critic , actor , rule , max_repo_member);
+            
             critic(rule).minimum_members = min (critic(rule).members , [] , 1);
             critic(rule).minimum_pareto = min (critic(rule).pareto , [] , 1);
 
