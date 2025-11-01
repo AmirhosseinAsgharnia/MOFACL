@@ -41,15 +41,15 @@ gama_data.capture_radius = capture_radius;
 
 %% hyper parameters
 
-actor_learning_rate = 0.01;
+actor_learning_rate = 0.1;
 
 critic_learning_rate = 0.1;
 
 discount_factor = 0.5;
 
-number_of_angle = 2;
+number_of_angle = 5;
 
-max_repo_member = 20;
+max_repo_member = 10;
 
 angle_list = linspace (0 , pi/2 , number_of_angle);
 
@@ -143,7 +143,7 @@ for episode = 1 : max_episode
     position_agent (1 , :) = [0 , 0 , pi/4];
 
     tic
-
+    
     while ~terminate && iteration < max_iteration
 
         iteration = iteration + 1;
@@ -259,10 +259,8 @@ for episode = 1 : max_episode
         end
 
         %% calculating temporal difference (Delta)
-        reward_1 = reward_1 * 0.8 + reward_2*0.2;
-        reward_2 = 0;
-        Delta = [reward_1 , reward_2] + discount_factor * V_s_2 - V_s_1;
-        
+
+        Delta = [reward_1 , reward_2] + discount_factor * V_s_2 - V_s_1;        
         
         %% updating critic
 

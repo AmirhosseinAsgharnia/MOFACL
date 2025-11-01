@@ -10,7 +10,7 @@ for rule = 1 : number_of_rules
 
     origin = critic (rule) . minimum_pareto;
 
-    for i = 1:3
+    for i = [1 2]
         D = abs ( (critic (rule) . pareto (: , 1) - origin (1) ) * sin (angle_list(i)) - ...
             (critic (rule) . pareto (: , 2) - origin (2) ) * cos (angle_list(i)) );
 
