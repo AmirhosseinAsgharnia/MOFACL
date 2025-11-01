@@ -1,6 +1,6 @@
 function pareto_test (critic , actor , episode )
 
-Rules = [2 5];
+Rules = [51 71];
 
 fig = figure('Visible','off');
 
@@ -26,14 +26,14 @@ for rule = Rules
     for member = 1:numel(critic(rule).pareto) / 2
 
         text(critic(rule).pareto(member,1) , critic(rule).pareto(member,2) , ...
-            sprintf("\\leftarrow \\theta = %d , w = %.2f" , critic(rule).pareto_index(member), actor(rule).pareto(member)));
+            sprintf("\\leftarrow w = %.2f" , actor(rule).pareto(member)));
 
     end
     
     grid minor
 
-    % xlim([-2 2])
-    % ylim([-2 2])
+    xlim([-1 1])
+    ylim([-1 1])
 end
 
 
