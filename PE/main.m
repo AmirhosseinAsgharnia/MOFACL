@@ -39,9 +39,9 @@ gama_data.capture_radius = capture_radius;
 
 %% hyper parameters
 
-actor_learning_rate = 0.1;
+actor_learning_rate = 0.05;
 
-critic_learning_rate = 0.1;
+critic_learning_rate = 0.05;
 
 discount_factor = 0.5;
 
@@ -53,7 +53,6 @@ angle_list = linspace (0 , pi/2 , number_of_angle);
 
 sigma = 0.5;
 
-epsilon = 0.33;
 %% algorithm parameters
 
 number_of_objectives = 2;
@@ -128,7 +127,7 @@ test_count = 0;
 
 for episode = 1 : max_episode
 
-    % sigma = sigma * 10 ^ (log10(0.2)/max_episode);
+    sigma = sigma * 10 ^ (log10(0.2)/max_episode);
     % actor_learning_rate  = actor_learning_rate * 10 ^ (log10(0.5)/max_episode);
     % critic_learning_rate = critic_learning_rate * 10 ^ (log10(0.5)/max_episode);
 
@@ -160,11 +159,7 @@ for episode = 1 : max_episode
 
             Distances = distance_from_vector( angle_list(angle), critic(rule).minimum_members , critic(rule).members );
 
-            if rand < epsilon
-                select = randi([1 numel(Distances)]);
-            else
-                [~ , select] = min (Distances);
-            end
+            [~ , select] = min (Distances);
 
             critic(rule).selected = select;
 
@@ -275,9 +270,10 @@ for episode = 1 : max_episode
                 critic(rule).members = [critic(rule).members ; New_critics];
 
                 [R_x , R_y] = delta_direction_calculator(angle_list(angle) , critic(rule).minimum_members , critic(rule).members(critic(rule).selected,:) , New_critics);
-
-                New_actors = actor(rule).members(critic(rule).selected) + actor_learning_rate * sign(up - u.res) * (sign(R_x) * abs(Delta(i,1)) + sign(R_y) * abs(Delta(i,2))) * active_rules_1.phi(firing_strength_counter);
                 
+
+                New_actors = actor(rule).members(critic(rule).selected) + actor_learning_rate * sign(up - u.res) * ( sign(R_x) * abs(Delta(i,1)) +  sign(R_y) * abs(Delta(i,2))) * active_rules_1.phi(firing_strength_counter);
+
                 New_actors = max(min(New_actors , pi/6) , -pi/6);
 
                 actor(rule).members = [actor(rule).members ; New_actors];

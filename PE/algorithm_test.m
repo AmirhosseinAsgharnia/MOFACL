@@ -13,7 +13,7 @@ set(fig,'defaultaxesfontsize',4)
 set(fig,'defaulttextfontsize',4)
 Fuzzy_actor_s = Fuzzy_actor;
 
-for num = 1:2
+for num = 1:3
 
     Fuzzy_actor_s.weights = Fuzzy_actor.weights(: , num);
 
