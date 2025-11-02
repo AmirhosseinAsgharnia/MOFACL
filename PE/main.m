@@ -39,9 +39,9 @@ gama_data.capture_radius = capture_radius;
 
 %% hyper parameters
 
-actor_learning_rate = 0.01;
+actor_learning_rate = 0.05;
 
-critic_learning_rate = 0.1;
+critic_learning_rate = 0.05;
 
 discount_factor = 0.5;
 
@@ -293,6 +293,31 @@ for episode = 1 : max_episode
             critic(rule).index = critic(rule).index(unique_index);
 
             [critic , actor] = pareto_synthesizer (critic , actor , rule , max_repo_member);
+            
+            %% Actor refining
+                
+            critic_r = critic;
+            actor_r  = actor;
+
+            [~ , sort_order] = sort(critic_r(rule).members(: , 1) , 'descend');
+            actor_r(rule).members = actor_r(rule).members(sort_order);
+
+            for i = 1:numel(actor_r(rule).members)
+
+                if i~=1 || i~=numel(actor_r(rule).members)
+                    actor_r(rule).members(i) = (actor_r(rule).members(i-1) + actor_r(rule).members(i) + actor_r(rule).members(i+1))/3;
+                elseif i == 1
+                    actor_r(rule).members(i) = (actor_r(rule).members(i) + actor_r(rule).members(i+1))/2;
+                elseif i==numel(actor_r(rule).members)
+                    actor_r(rule).members(i) = (actor_r(rule).members(i) + actor_r(rule).members(i-1))/2;
+                end
+
+            end
+            
+            [~ , sort_order_2] = sort(sort_order , 'ascend');
+            actor(rule).members = actor_r(rule).members(sort_order_2);
+
+            %%
 
             critic(rule).minimum_members = min (critic(rule).members , [] , 1);
             critic(rule).minimum_pareto = min (critic(rule).pareto , [] , 1);
