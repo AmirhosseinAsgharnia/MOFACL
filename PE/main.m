@@ -7,7 +7,7 @@ rng(145)
 mkdir("Figs")
 %% simulation time parameters
 
-max_episode = 10000; % maximum times a whole game is played.
+max_episode = 2000; % maximum times a whole game is played.
 
 test_episode = 20; % each "test_episode" a test without noise is conducted.
 
@@ -39,9 +39,9 @@ gama_data.capture_radius = capture_radius;
 
 %% hyper parameters
 
-actor_learning_rate = 0.05;
+actor_learning_rate = 0.01;
 
-critic_learning_rate = 0.05;
+critic_learning_rate = 0.1;
 
 discount_factor = 0.5;
 
@@ -51,7 +51,7 @@ max_repo_member = 10;
 
 angle_list = linspace (0 , pi/2 , number_of_angle);
 
-sigma = 0.5;
+sigma = 0.25;
 
 %% algorithm parameters
 
@@ -127,7 +127,7 @@ test_count = 0;
 
 for episode = 1 : max_episode
 
-    sigma = sigma * 10 ^ (log10(0.2)/max_episode);
+    % sigma = sigma * 10 ^ (log10(0.2)/max_episode);
     % actor_learning_rate  = actor_learning_rate * 10 ^ (log10(0.5)/max_episode);
     % critic_learning_rate = critic_learning_rate * 10 ^ (log10(0.5)/max_episode);
 
@@ -138,7 +138,7 @@ for episode = 1 : max_episode
 
     position_agent = zeros (max_iteration , 3);
     position_agent (1 , :) = [dimension * rand , dimension * rand , 2 * pi * rand - pi];
-
+    % position_agent (1 , :) = [0 0 pi/4];
     tic
     
     while ~terminate && iteration < max_iteration
@@ -271,7 +271,6 @@ for episode = 1 : max_episode
 
                 [R_x , R_y] = delta_direction_calculator(angle_list(angle) , critic(rule).minimum_members , critic(rule).members(critic(rule).selected,:) , New_critics);
                 
-
                 New_actors = actor(rule).members(critic(rule).selected) + actor_learning_rate * sign(up - u.res) * ( sign(R_x) * abs(Delta(i,1)) +  sign(R_y) * abs(Delta(i,2))) * active_rules_1.phi(firing_strength_counter);
 
                 New_actors = max(min(New_actors , pi/6) , -pi/6);
