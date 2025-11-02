@@ -39,9 +39,9 @@ gama_data.capture_radius = capture_radius;
 
 %% hyper parameters
 
-actor_learning_rate = 0.05;
+actor_learning_rate = 0.1;
 
-critic_learning_rate = 0.05;
+critic_learning_rate = 0.1;
 
 discount_factor = 0.5;
 
@@ -303,13 +303,14 @@ for episode = 1 : max_episode
             actor_r(rule).members = actor_r(rule).members(sort_order);
 
             for i = 1:numel(actor_r(rule).members)
-
-                if i~=1 || i~=numel(actor_r(rule).members)
-                    actor_r(rule).members(i) = (actor_r(rule).members(i-1) + actor_r(rule).members(i) + actor_r(rule).members(i+1))/3;
-                elseif i == 1
-                    actor_r(rule).members(i) = (actor_r(rule).members(i) + actor_r(rule).members(i+1))/2;
-                elseif i==numel(actor_r(rule).members)
-                    actor_r(rule).members(i) = (actor_r(rule).members(i) + actor_r(rule).members(i-1))/2;
+                if numel(actor_r(rule).members) ~= 1
+                    if i == 1
+                        actor_r(rule).members(i) = (10*actor_r(rule).members(i) + actor_r(rule).members(i+1))/11;
+                    elseif i==numel(actor_r(rule).members)
+                        actor_r(rule).members(i) = (10*actor_r(rule).members(i) + actor_r(rule).members(i-1))/11;
+                    else
+                        actor_r(rule).members(i) = (actor_r(rule).members(i-1) + 10*actor_r(rule).members(i) + actor_r(rule).members(i+1))/12;
+                    end
                 end
 
             end
