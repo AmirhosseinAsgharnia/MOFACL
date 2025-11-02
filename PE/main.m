@@ -45,7 +45,7 @@ critic_learning_rate = 0.1;
 
 discount_factor = 0.5;
 
-number_of_angle = 3;
+number_of_angle = 5;
 
 max_repo_member = 10;
 
@@ -138,7 +138,7 @@ for episode = 1 : max_episode
     %% episode simulation
 
     position_agent = zeros (max_iteration , 3);
-    position_agent (1 , :) = [0 , 0 , pi/4];
+    position_agent (1 , :) = [dimension * rand , dimension * rand , 2 * pi * rand - pi];
 
     tic
     
