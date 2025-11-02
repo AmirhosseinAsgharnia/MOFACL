@@ -39,9 +39,9 @@ gama_data.capture_radius = capture_radius;
 
 %% hyper parameters
 
-actor_learning_rate = 0.01;
+actor_learning_rate = 0.05;
 
-critic_learning_rate = 0.1;
+critic_learning_rate = 0.05;
 
 discount_factor = 0.5;
 
