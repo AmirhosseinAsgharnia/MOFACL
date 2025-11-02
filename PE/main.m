@@ -1,8 +1,6 @@
 close all; clear; clc
 
-if isfolder('Figs')
-    rmdir("Figs","s")
-end
+if isfolder('Figs'); rmdir("Figs","s"); end
 
 rng(145)
 
@@ -47,7 +45,7 @@ critic_learning_rate = 0.1;
 
 discount_factor = 0.5;
 
-number_of_angle = 5;
+number_of_angle = 3;
 
 max_repo_member = 10;
 
@@ -262,7 +260,7 @@ for episode = 1 : max_episode
 
         Delta = [reward_1 , reward_2] + discount_factor * V_s_2 - V_s_1;        
         
-        %% updating critic
+        %% updating actor and critic
 
         firing_strength_counter = 0;
 
@@ -278,7 +276,7 @@ for episode = 1 : max_episode
 
                 [R_x , R_y] = delta_direction_calculator(angle_list(angle) , critic(rule).minimum_members , critic(rule).members(critic(rule).selected,:) , New_critics);
 
-                New_actors = actor(rule).members(critic(rule).selected) + actor_learning_rate * sign(up - u.res) * (sign(R_x) * abs(Delta(1)) + sign(R_y) * abs(Delta(2))) * active_rules_1.phi(firing_strength_counter);
+                New_actors = actor(rule).members(critic(rule).selected) + actor_learning_rate * sign(up - u.res) * (sign(R_x) * abs(Delta(i,1)) + sign(R_y) * abs(Delta(i,2))) * active_rules_1.phi(firing_strength_counter);
                 
                 New_actors = max(min(New_actors , pi/6) , -pi/6);
 
