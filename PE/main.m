@@ -13,7 +13,7 @@ test_episode = 20; % each "test_episode" a test without noise is conducted.
 
 max_time_horizon = 200; % maximum duration of each epoch.
 
-step_time = .1; % step time. (100 ms)
+step_time = 0.1; % step time. (100 ms)
 
 max_iteration = max_time_horizon / step_time + 1;
 
@@ -51,7 +51,7 @@ max_repo_member = 10;
 
 angle_list = linspace (0 , pi/2 , number_of_angle);
 
-sigma = 0.25;
+sigma = 0.4;
 
 %% algorithm parameters
 
@@ -252,7 +252,12 @@ for episode = 1 : max_episode
         end
 
         %% calculating temporal difference (Delta)
-
+        
+        if terminate == 1
+            reward_1 = reward_1 + 2;
+        elseif terminate == 2
+            reward_2 = reward_2 - 2;
+        end
         Delta = [reward_1 , reward_2] + discount_factor * V_s_2 - V_s_1;        
         
         %% updating actor and critic

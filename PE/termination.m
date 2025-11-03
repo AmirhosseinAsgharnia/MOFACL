@@ -6,7 +6,7 @@ if distance_real(position_agent(iteration + 1 , 1:2) , position_goal) < capture_
 
 elseif distance_real(position_agent(iteration + 1 , 1:2) , position_pit) < capture_radius
 
-    terminate = 1;
+    terminate = 2;
 
 else
 

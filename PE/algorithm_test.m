@@ -19,7 +19,7 @@ for num = 1:3
 
     max_iteration = 2000;
 
-    step_time = .1;
+    step_time = 0.1;
 
     capture_radius = 3;
 

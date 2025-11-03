@@ -39,8 +39,8 @@ for rule = Rules
     
     grid minor
 
-    xlim([-1  1])
-    ylim([-1  1])
+    % xlim([-1  1])
+    % ylim([-1  1])
 end
 
 
