@@ -4,16 +4,16 @@ fig = figure('Visible','off');
 
 set(fig, ...
     'Units',        'inches', ...
-    'Position',     [0 0 8 2.2], ...
+    'Position',     [0 0 7 4], ...
     'PaperUnits',   'inches', ...
-    'PaperPosition',[0 0 8 2.2] ...
+    'PaperPosition',[0 0 7 4] ...
     );
 
 set(fig,'defaultaxesfontsize',4)
 set(fig,'defaulttextfontsize',4)
 Fuzzy_actor_s = Fuzzy_actor;
 
-for num = 1:3
+for num = 1:5
 
     Fuzzy_actor_s.weights = Fuzzy_actor.weights(: , num);
 
@@ -75,7 +75,7 @@ for num = 1:3
 
     plot_color(n,:) = [i+1 , used_rule(i+1)];
 
-    subplot(1,3,num)
+    subplot(2,3,num)
 
     plot([0 0 gama_data.dimension gama_data.dimension 0],[0 gama_data.dimension gama_data.dimension 0 0],'--k')
     hold on
