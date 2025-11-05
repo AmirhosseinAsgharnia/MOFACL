@@ -45,7 +45,6 @@ critic_learning_rate = 0.025;
 
 discount_factor = 0.5;
 
-
 number_of_angle = 10;
 
 max_repo_member = 15;
