@@ -39,15 +39,15 @@ gama_data.capture_radius = capture_radius;
 
 %% hyper parameters
 
-actor_learning_rate = 0.02;
+actor_learning_rate = 0.1;
 
-critic_learning_rate = 0.02;
+critic_learning_rate = 0.1;
 
 discount_factor = 0.5;
 
 number_of_angle = 5;
 
-max_repo_member = 10;
+max_repo_member = 20;
 
 angle_list = linspace (0 , pi/2 , number_of_angle);
 
@@ -127,8 +127,8 @@ test_count = 0;
 for episode = 1 : max_episode
 
     sigma = sigma * 10 ^ (log10(0.2)/max_episode);
-    actor_learning_rate  = actor_learning_rate * 10 ^ (log10(0.5)/max_episode);
-    critic_learning_rate = critic_learning_rate * 10 ^ (log10(0.5)/max_episode);
+    actor_learning_rate  = actor_learning_rate * 10 ^ (log10(0.1)/max_episode);
+    critic_learning_rate = critic_learning_rate * 10 ^ (log10(0.1)/max_episode);
 
     terminate = 0;
     iteration = 0;
