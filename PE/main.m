@@ -39,9 +39,9 @@ gama_data.capture_radius = capture_radius;
 
 %% hyper parameters
 
-actor_learning_rate = 0.025;
+actor_learning_rate = 0.02;
 
-critic_learning_rate = 0.025;
+critic_learning_rate = 0.02;
 
 discount_factor = 0.5;
 
@@ -127,9 +127,9 @@ test_count = 0;
 
 for episode = 1 : max_episode
 
-    % sigma = sigma * 10 ^ (log10(0.2)/max_episode);
-    % actor_learning_rate  = actor_learning_rate * 10 ^ (log10(0.5)/max_episode);
-    % critic_learning_rate = critic_learning_rate * 10 ^ (log10(0.5)/max_episode);
+    sigma = sigma * 10 ^ (log10(0.2)/max_episode);
+    actor_learning_rate  = actor_learning_rate * 10 ^ (log10(0.5)/max_episode);
+    critic_learning_rate = critic_learning_rate * 10 ^ (log10(0.5)/max_episode);
 
     terminate = 0;
     iteration = 0;
@@ -152,9 +152,11 @@ for episode = 1 : max_episode
         active_rules_1 = fuzzy_engine_3 ([position_agent(iteration , 1) , position_agent(iteration , 2) , position_agent(iteration , 3)] , Fuzzy_test); % Just to check which rules are going be fired.
 
         %% pre-processing the rule-base and exploration - exploitation (distance from origin) (ND is applyed before!)
-
-        angle = randi ([1 number_of_angle]);
-
+        
+        if mod(iteration , 5) == 0 || iteration == 1
+            angle = randi ([1 number_of_angle]);
+        end
+        
         for rule = active_rules_1.act'
 
             Distances = distance_from_vector( angle_list(angle), critic(rule).minimum_members , critic(rule).members );
@@ -196,7 +198,9 @@ for episode = 1 : max_episode
         %% reward calculation
 
         [reward_1 , reward_2] = reward_function (iteration , position_agent , position_goal , position_pit);
-
+        
+        reward_1 = 0.8 * reward_1 + 0.2 * reward_2;
+        reward_2 = 0;
         %% calculating v_{t}
 
         v_weighted = zeros (numel(active_rules_1.act) , number_of_objectives );
@@ -253,11 +257,11 @@ for episode = 1 : max_episode
 
         %% calculating temporal difference (Delta)
         
-        if terminate == 1
-            reward_1 = reward_1 + 2;
-        elseif terminate == 2
-            reward_2 = reward_2 - 2;
-        end
+        % if terminate == 1
+        %     reward_1 = reward_1 + 3;
+        % elseif terminate == 2
+        %     reward_2 = reward_2 - 3;
+        % end
         Delta = [reward_1 , reward_2] + discount_factor * V_s_2 - V_s_1;        
         
         %% updating actor and critic
