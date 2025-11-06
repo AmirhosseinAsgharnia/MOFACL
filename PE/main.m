@@ -45,9 +45,9 @@ critic_learning_rate = 0.02;
 
 discount_factor = 0.5;
 
-number_of_angle = 10;
+number_of_angle = 5;
 
-max_repo_member = 15;
+max_repo_member = 10;
 
 angle_list = linspace (0 , pi/2 , number_of_angle);
 
@@ -120,7 +120,6 @@ for rule = 1 : number_of_rules
 
 end
 
-
 %% training loop
 
 test_count = 0;
@@ -188,6 +187,7 @@ for episode = 1 : max_episode
         position_agent = border(position_agent , iteration);
 
         terminate = termination (iteration , capture_radius , position_agent , position_goal , position_pit);
+        
 
         %% fired rules (state s')
 
@@ -199,8 +199,6 @@ for episode = 1 : max_episode
 
         [reward_1 , reward_2] = reward_function (iteration , position_agent , position_goal , position_pit);
         
-        reward_1 = 0.8 * reward_1 + 0.2 * reward_2;
-        reward_2 = 0;
         %% calculating v_{t}
 
         v_weighted = zeros (numel(active_rules_1.act) , number_of_objectives );
@@ -273,9 +271,9 @@ for episode = 1 : max_episode
             firing_strength_counter = firing_strength_counter + 1;
 
             for i = 1 : number_of_angle
-
+                
                 New_critics = critic(rule).members(critic(rule).selected,:) + critic_learning_rate * Delta(i , :) * active_rules_1.phi(firing_strength_counter);
-
+            
                 critic(rule).members = [critic(rule).members ; New_critics];
 
                 [R_x , R_y] = delta_direction_calculator(angle_list(angle) , critic(rule).minimum_members , critic(rule).members(critic(rule).selected,:) , New_critics);
