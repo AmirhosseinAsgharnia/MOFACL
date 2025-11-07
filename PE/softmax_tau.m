@@ -7,7 +7,7 @@
 % p = exp(tau_opt * z) / sum(exp(tau_opt * z));
 
 function p = softmax_tau(x)
-    tau_opt = 5;  % temperature parameter
+    tau_opt = 20;  % temperature parameter
 
     % Shift to avoid negatives (optional if you just flip sign)
     shift_x = x + 2 * abs(min(x)) + 0.01;
