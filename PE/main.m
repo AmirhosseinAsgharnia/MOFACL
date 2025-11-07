@@ -47,7 +47,7 @@ discount_factor = 0.5;
 
 number_of_angle = 5;
 
-max_repo_member = 20;
+max_repo_member = 10;
 
 angle_list = linspace (0 , pi/2 , number_of_angle);
 
@@ -86,9 +86,9 @@ Fuzzy_test.input_bounds = [0 dimension;0 dimension;-pi pi];
 
 %% critic spaces
 
-critic.members = 0 * ones ( max_repo_member , number_of_objectives);
+critic.members = 1 * rand ( max_repo_member , number_of_objectives);
 
-critic.index = 0 * ones ( max_repo_member , 1);
+critic.index = 1 * ones ( max_repo_member , 1);
 
 critic.crowding_distance = 0 * ones ( max_repo_member , 1);
 
@@ -127,8 +127,8 @@ test_count = 0;
 for episode = 1 : max_episode
 
     sigma = sigma * 10 ^ (log10(0.2)/max_episode);
-    actor_learning_rate  = actor_learning_rate * 10 ^ (log10(0.1)/max_episode);
-    critic_learning_rate = critic_learning_rate * 10 ^ (log10(0.1)/max_episode);
+    actor_learning_rate  = actor_learning_rate * 10 ^ (log10(0.5)/max_episode);
+    critic_learning_rate = critic_learning_rate * 10 ^ (log10(0.5)/max_episode);
 
     terminate = 0;
     iteration = 0;
@@ -152,9 +152,9 @@ for episode = 1 : max_episode
 
         %% pre-processing the rule-base and exploration - exploitation (distance from origin) (ND is applyed before!)
         
-        if mod(iteration , 5) == 0 || iteration == 1
+        % if mod(iteration , 5) == 0 || iteration == 1
             angle = randi ([1 number_of_angle]);
-        end
+        % end
         
         for rule = active_rules_1.act'
 
@@ -233,7 +233,7 @@ for episode = 1 : max_episode
 
         V_s_2 = zeros (number_of_angle , 2);
 
-        for i = 1:number_of_angle
+        for i = angle
 
             Fuzzy_critic.weights = zeros (number_of_rules , 1);
 
@@ -254,12 +254,7 @@ for episode = 1 : max_episode
         end
 
         %% calculating temporal difference (Delta)
-        
-        % if terminate == 1
-        %     reward_1 = reward_1 + 3;
-        % elseif terminate == 2
-        %     reward_2 = reward_2 - 3;
-        % end
+       
         Delta = [reward_1 , reward_2] + discount_factor * V_s_2 - V_s_1;        
         
         %% updating actor and critic
@@ -270,7 +265,7 @@ for episode = 1 : max_episode
 
             firing_strength_counter = firing_strength_counter + 1;
 
-            for i = 1 : number_of_angle
+            for i = angle
                 
                 New_critics = critic(rule).members(critic(rule).selected,:) + critic_learning_rate * Delta(i , :) * active_rules_1.phi(firing_strength_counter);
             

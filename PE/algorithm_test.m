@@ -58,7 +58,7 @@ for num = 1:5
 
     end
 
-    if terminate == 1
+    if terminate == 1 || terminate == 2
         position_agent ( iteration + 2 : end , :) = [];
         used_rule( iteration + 1 : end) = [];
     end
