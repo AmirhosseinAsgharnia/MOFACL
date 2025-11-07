@@ -39,9 +39,9 @@ gama_data.capture_radius = capture_radius;
 
 %% hyper parameters
 
-actor_learning_rate = 0.1;
+actor_learning_rate = 0.01;
 
-critic_learning_rate = 0.1;
+critic_learning_rate = 0.02;
 
 discount_factor = 0.5;
 
@@ -104,7 +104,7 @@ critic = repmat (critic , number_of_rules , 1);
 
 %% actor spaces
 
-actor.members = 0 * ones ( max_repo_member , 1);
+actor.members = 1 * rand ( max_repo_member , 1);
 
 actor.pareto = 0 * ones ( 1 , 1);
 
@@ -127,8 +127,8 @@ test_count = 0;
 for episode = 1 : max_episode
 
     sigma = sigma * 10 ^ (log10(0.2)/max_episode);
-    actor_learning_rate  = actor_learning_rate * 10 ^ (log10(0.5)/max_episode);
-    critic_learning_rate = critic_learning_rate * 10 ^ (log10(0.5)/max_episode);
+    % actor_learning_rate  = actor_learning_rate * 10 ^ (log10(0.5)/max_episode);
+    % critic_learning_rate = critic_learning_rate * 10 ^ (log10(0.5)/max_episode);
 
     terminate = 0;
     iteration = 0;
@@ -136,8 +136,8 @@ for episode = 1 : max_episode
     %% episode simulation
 
     position_agent = zeros (max_iteration , 3);
-    position_agent (1 , :) = [dimension * rand , dimension * rand , 2 * pi * rand - pi];
-    % position_agent (1 , :) = [0 0 pi/4];
+    % position_agent (1 , :) = [dimension * rand , dimension * rand , 2 * pi * rand - pi];
+    position_agent (1 , :) = [0 0 pi/4];
     tic
     
     while ~terminate && iteration < max_iteration
@@ -153,7 +153,7 @@ for episode = 1 : max_episode
         %% pre-processing the rule-base and exploration - exploitation (distance from origin) (ND is applyed before!)
         
         % if mod(iteration , 5) == 0 || iteration == 1
-            angle = randi ([1 number_of_angle]);
+        angle = randi ([1 number_of_angle]);
         % end
         
         for rule = active_rules_1.act'
@@ -233,7 +233,7 @@ for episode = 1 : max_episode
 
         V_s_2 = zeros (number_of_angle , 2);
 
-        for i = angle
+        for i = 1:number_of_angle
 
             Fuzzy_critic.weights = zeros (number_of_rules , 1);
 
@@ -265,7 +265,7 @@ for episode = 1 : max_episode
 
             firing_strength_counter = firing_strength_counter + 1;
 
-            for i = angle
+            for i = 1:number_of_angle
                 
                 New_critics = critic(rule).members(critic(rule).selected,:) + critic_learning_rate * Delta(i , :) * active_rules_1.phi(firing_strength_counter);
             
