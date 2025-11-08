@@ -328,9 +328,9 @@ for episode = 1 : max_episode
 
         i=1;
         Fuzzy_actor.weights = actor_weights;
-        algorithm_test (Fuzzy_actor ,critic, Selected_particles, episode , gama_data , i);
+        algorithm_test (Fuzzy_actor , episode , gama_data , i);
+        animation_test (Fuzzy_actor ,critic , Selected_particles , gama_data );
         pareto_test (critic , actor , episode );
-        % save(sprintf("policy.mat" ))
 
     end
 
