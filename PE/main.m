@@ -39,9 +39,9 @@ gama_data.capture_radius = capture_radius;
 
 %% hyper parameters
 
-actor_learning_rate = 0.005;
+actor_learning_rate = 0.05;
 
-critic_learning_rate = 0.01;
+critic_learning_rate = 0.05;
 
 discount_factor = 0.5;
 
@@ -59,7 +59,7 @@ number_of_objectives = 2;
 
 number_of_inputs = 3;
 
-number_of_membership_functions = 7;
+number_of_membership_functions = 5;
 
 number_of_rules = number_of_membership_functions ^ number_of_inputs;
 
@@ -86,7 +86,7 @@ Fuzzy_test.input_bounds = [0 dimension;0 dimension;-pi pi];
 
 %% critic spaces
 
-critic.members = 1 * zeros ( max_repo_member , number_of_objectives);
+critic.members = .1 * zeros ( max_repo_member , number_of_objectives);
 
 critic.index = 1 * ones ( max_repo_member , 1);
 % critic.label = 1:10;
@@ -206,6 +206,11 @@ for episode = 1 : max_episode
 
         [reward_1 , reward_2] = reward_function (iteration , position_agent , position_goal , position_pit);
 
+        if terminate == 1
+            reward_1 = +2;
+        elseif terminate == 2
+            reward_1 = -2;
+        end
         %% calculating v_{t}
 
         v_weighted = zeros (numel(active_rules_1.act) , number_of_objectives );
@@ -241,9 +246,9 @@ for episode = 1 : max_episode
         V_s_2 = zeros (number_of_angle , 2);
         
         if angle == 1
-            ang_list = [1 2 3];
+            ang_list = [1 2];
         elseif angle == 10
-            ang_list = [8 9 10];
+            ang_list = [9 10];
         else
             ang_list = [angle-1,angle,angle+1];
         end
