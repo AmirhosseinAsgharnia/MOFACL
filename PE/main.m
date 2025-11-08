@@ -39,13 +39,13 @@ gama_data.capture_radius = capture_radius;
 
 %% hyper parameters
 
-actor_learning_rate = 0.025;
+actor_learning_rate = 0.01;
 
-critic_learning_rate = 0.1;
+critic_learning_rate = 0.02;
 
 discount_factor = 0.5;
 
-number_of_angle = 5;
+number_of_angle = 10;
 
 max_repo_member = 10;
 
@@ -86,10 +86,10 @@ Fuzzy_test.input_bounds = [0 dimension;0 dimension;-pi pi];
 
 %% critic spaces
 
-critic.members = 0.1 * randn ( max_repo_member , number_of_objectives);
+critic.members = 1 * zeros ( max_repo_member , number_of_objectives);
 
 critic.index = 1 * ones ( max_repo_member , 1);
-
+% critic.label = 1:10;
 critic.crowding_distance = 0 * ones ( max_repo_member , 1);
 
 critic.minimum_members = 0*ones ( 1 , number_of_objectives);
@@ -161,13 +161,20 @@ for episode = 1 : max_episode
             Distances = distance_from_vector( angle_list(angle), critic(rule).minimum_members , critic(rule).members );
 
             [~,select] = min(Distances);
-            
+
             critic(rule).selected = select;
 
             actor_output_parameters(rule) = actor(rule).members (critic(rule).selected);
 
         end
 
+        % for rule = active_rules_1.act'
+        % 
+        %     select = find(critic(rule).label == angle);
+        %     critic(rule).selected = select;
+        %     actor_output_parameters(rule) = actor(rule).members (critic(rule).selected);
+        % 
+        % end
         %% selecting action
 
         Fuzzy_actor.weights = actor_output_parameters;
@@ -233,7 +240,7 @@ for episode = 1 : max_episode
 
         V_s_2 = zeros (number_of_angle , 2);
 
-        for i = angle
+        for i = 1:number_of_angle
 
             Fuzzy_critic.weights = zeros (number_of_rules , 1);
 
@@ -265,7 +272,7 @@ for episode = 1 : max_episode
 
             firing_strength_counter = firing_strength_counter + 1;
 
-            for i = angle
+            for i = 1:number_of_angle
                 
                 New_critics = critic(rule).members(critic(rule).selected,:) + critic_learning_rate * Delta(i , :) * active_rules_1.phi(firing_strength_counter);
             
@@ -296,8 +303,8 @@ for episode = 1 : max_episode
 
             [critic , actor] = pareto_synthesizer (critic , actor , rule , max_repo_member);
 
-            critic(rule).minimum_members = min (critic(rule).members , [] , 1) - 0.01;
-            critic(rule).minimum_pareto = min (critic(rule).pareto , [] , 1) - 0.01;
+            critic(rule).minimum_members = min (critic(rule).members , [] , 1);
+            critic(rule).minimum_pareto = min (critic(rule).pareto , [] , 1);
 
         end
     end
@@ -317,11 +324,11 @@ for episode = 1 : max_episode
         fprintf ("Test number %d has been started.\n" , test_count);
         fprintf ("--------------------------------------------------------\n");
 
-        actor_weights = G_test (critic , actor , angle_list);
+        [Selected_particles , actor_weights] = G_test (critic , actor , angle_list);
 
         i=1;
         Fuzzy_actor.weights = actor_weights;
-        algorithm_test (Fuzzy_actor , episode , gama_data , i);
+        algorithm_test (Fuzzy_actor ,critic, Selected_particles, episode , gama_data , i);
         pareto_test (critic , actor , episode );
         % save(sprintf("policy.mat" ))
 

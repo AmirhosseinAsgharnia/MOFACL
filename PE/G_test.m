@@ -1,10 +1,12 @@
-function actor_weights = G_test (critic , actor , angle_list)
+function [Selected_particles , actor_weights] = G_test (critic , actor , angle_list)
 
 number_of_rules = numel (actor);
 
 actor_weights = zeros (number_of_rules , 3);
 
 angle_list = linspace (0 , pi/2 , 10);
+
+Selected_particles = zeros(number_of_rules , 5);
 
 for rule = 1 : number_of_rules
 
@@ -15,7 +17,7 @@ for rule = 1 : number_of_rules
             (critic (rule) . pareto (: , 2) - origin (2) ) * cos (angle_list(i)) );
 
         [~ , select] = min (D );
-
+        Selected_particles(rule , i) = select;
         actor_weights (rule , i) = actor(rule).pareto(select);
 
     end
