@@ -39,9 +39,9 @@ gama_data.capture_radius = capture_radius;
 
 %% hyper parameters
 
-actor_learning_rate = 0.005;
+actor_learning_rate = 0.05;
 
-critic_learning_rate = 0.01;
+critic_learning_rate = 0.05;
 
 discount_factor = 0.5;
 
@@ -89,7 +89,7 @@ Fuzzy_test.input_bounds = [0 dimension;0 dimension;-pi pi];
 critic.members = 1 * zeros ( max_repo_member , number_of_objectives);
 
 critic.index = 1 * ones ( max_repo_member , 1);
-% critic.label = 1:10;
+
 critic.crowding_distance = 0 * ones ( max_repo_member , 1);
 
 critic.minimum_members = 0*ones ( 1 , number_of_objectives);
@@ -158,23 +158,20 @@ for episode = 1 : max_episode
         
         for rule = active_rules_1.act'
 
-            Distances = distance_from_vector( angle_list(angle), critic(rule).minimum_members , critic(rule).members );
+            select_pareto = find(critic(rule).index == 1);
+            crowding_distances = critic(rule).crowding_distance(select_pareto);
 
-            [~,select] = min(Distances);
+            for i = find(crowding_distances == inf)
+                crowding_distances(i) = 10;
+            end
 
+            crowding_distances = softmax_tau(-crowding_distances);
+            select_crowding_distance = find(rand < cumsum(crowding_distances),1);
+            select = select_crowding_distance;
             critic(rule).selected = select;
-
-            actor_output_parameters(rule) = actor(rule).members (critic(rule).selected);
 
         end
 
-        % for rule = active_rules_1.act'
-        % 
-        %     select = find(critic(rule).label == angle);
-        %     critic(rule).selected = select;
-        %     actor_output_parameters(rule) = actor(rule).members (critic(rule).selected);
-        % 
-        % end
         %% selecting action
 
         Fuzzy_actor.weights = actor_output_parameters;
