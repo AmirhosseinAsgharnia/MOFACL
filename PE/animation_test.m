@@ -5,7 +5,7 @@ fig_anim = figure;
 
 set(fig_anim, ...
     'Units',        'inches', ...
-    'Position',     [0.1 1 8 8], ...
+    'Position',     [0.1 1 10 8], ...
     'PaperUnits',   'inches', ...
     'PaperPosition',[0 0 14 8] ...
     );
@@ -59,7 +59,7 @@ while ~terminate && iteration < max_iteration
 
     if iteration == 1
 
-        subplot(2,2,1)
+        subplot(2,3,1)
         plot(gama_data.position_goal(1) + capture_radius * cos(0:0.1:2*pi) , gama_data.position_goal(2) + capture_radius * sin(0:0.1:2*pi) , '-g')
         hold on
         plot(gama_data.position_pit(1) + capture_radius * cos(0:0.1:2*pi) , gama_data.position_pit(2) + capture_radius * sin(0:0.1:2*pi) , '-r')
@@ -71,7 +71,7 @@ while ~terminate && iteration < max_iteration
 
     end
 
-    subplot(2,2,1)
+    subplot(2,3,1)
 
     plot(position_agent(iteration+1 , 1) , position_agent(iteration+1 , 2) , ".r"); hold on
 
@@ -80,10 +80,10 @@ while ~terminate && iteration < max_iteration
     if iteration~=1
         
         [~,S] = sort(u.phi,'descend');
-        S = S(1:3);
+        S = S(1:5);
         for j = 1:numel(S)
 
-            subplot(2,2,j+1)
+            subplot(2,3,j+1)
 
             plot(critic(u.act(S(j))).members(:,1) , critic(u.act(S(j))).members(:,2) , "*k")
             hold on
@@ -95,7 +95,7 @@ while ~terminate && iteration < max_iteration
 
             text(critic(u.act(S(j))).pareto(Selected_particles(u.act(S(j)),num),1) , critic(u.act(S(j))).pareto(Selected_particles(u.act(S(j)),num),2) , ...
                 sprintf("\\leftarrow \\omega = %.2f" , Fuzzy_actor.weights(u.act(j))));
-            title(sprintf("Rule %d: \\phi: %f" , u.act(j),u.phi(j)))
+            title(sprintf("Rule %d: \\phi: %f" , u.act(S(j)),u.phi(S(j))))
 
         end
 

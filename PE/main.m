@@ -7,7 +7,7 @@ rng(145)
 mkdir("Figs")
 %% simulation time parameters
 
-max_episode = 5000; % maximum times a whole game is played.
+max_episode = 10000; % maximum times a whole game is played.
 
 test_episode = 20; % each "test_episode" a test without noise is conducted.
 
@@ -39,9 +39,9 @@ gama_data.capture_radius = capture_radius;
 
 %% hyper parameters
 
-actor_learning_rate = 0.01;
+actor_learning_rate = 0.005;
 
-critic_learning_rate = 0.02;
+critic_learning_rate = 0.01;
 
 discount_factor = 0.5;
 
@@ -59,7 +59,7 @@ number_of_objectives = 2;
 
 number_of_inputs = 3;
 
-number_of_membership_functions = 5;
+number_of_membership_functions = 7;
 
 number_of_rules = number_of_membership_functions ^ number_of_inputs;
 
@@ -136,8 +136,8 @@ for episode = 1 : max_episode
     %% episode simulation
 
     position_agent = zeros (max_iteration , 3);
-    position_agent (1 , :) = [dimension * rand , dimension * rand , 2 * pi * rand - pi];
-    % position_agent (1 , :) = [0 0 pi/4];
+    % position_agent (1 , :) = [dimension * rand , dimension * rand , 2 * pi * rand - pi];
+    position_agent (1 , :) = [0 0 pi/4];
     tic
     
     while ~terminate && iteration < max_iteration
@@ -239,8 +239,16 @@ for episode = 1 : max_episode
         matrix_G = G_extractor (critic , active_rules_2 , angle_list);
 
         V_s_2 = zeros (number_of_angle , 2);
+        
+        if angle == 1
+            ang_list = [1 2 3];
+        elseif angle == 10
+            ang_list = [8 9 10];
+        else
+            ang_list = [angle-1,angle,angle+1];
+        end
 
-        for i = 1:number_of_angle
+        for i = ang_list
 
             Fuzzy_critic.weights = zeros (number_of_rules , 1);
 
@@ -272,7 +280,7 @@ for episode = 1 : max_episode
 
             firing_strength_counter = firing_strength_counter + 1;
 
-            for i = 1:number_of_angle
+            for i = ang_list
                 
                 New_critics = critic(rule).members(critic(rule).selected,:) + critic_learning_rate * Delta(i , :) * active_rules_1.phi(firing_strength_counter);
             
@@ -329,7 +337,7 @@ for episode = 1 : max_episode
         i=1;
         Fuzzy_actor.weights = actor_weights;
         algorithm_test (Fuzzy_actor , episode , gama_data , i);
-        animation_test (Fuzzy_actor ,critic , Selected_particles , gama_data );
+        % animation_test (Fuzzy_actor ,critic , Selected_particles , gama_data );
         pareto_test (critic , actor , episode );
 
     end
