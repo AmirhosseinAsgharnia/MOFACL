@@ -44,8 +44,11 @@ for num = 1:5
         iteration = iteration + 1;
 
         %% input calculator
+        d_agent_goal_1 = distance_real (position_agent(iteration,:), gama_data.position_goal);
+        d_agent_pit_1 = distance_real (position_agent(iteration,:), gama_data.position_pit);
+        theta_1 = ang_adj(atan2(gama_data.position_goal(2) - position_agent(iteration,2), gama_data.position_goal(1) - position_agent(iteration,1)) - position_agent(iteration, 3));
 
-        u = fuzzy_engine_3 ([position_agent(iteration , 1) , position_agent(iteration , 2) , position_agent(iteration , 3)] , Fuzzy_actor_s);
+        u = fuzzy_engine_3 ([d_agent_goal_1, d_agent_pit_1, theta_1] , Fuzzy_actor_s);
         u_phi = [u.act u.phi];
         [~ , max_phi] = max( u_phi(:,2) );
         used_rule(iteration) = u.act(max_phi);
@@ -85,8 +88,8 @@ for num = 1:5
 
     plot([0 0 gama_data.dimension gama_data.dimension 0],[0 gama_data.dimension gama_data.dimension 0 0],'--k')
     hold on
-    plot(gama_data.position_pit(1)+3*cos(-pi:0.1:pi),gama_data.position_pit(2)+3*sin(-pi:0.1:pi),'r')
-    plot(gama_data.position_goal(1)+3*cos(-pi:0.1:pi),gama_data.position_goal(2)+3*sin(-pi:0.1:pi),'g')
+    plot(gama_data.position_pit(1)+1.5*cos(-pi:0.1:pi),gama_data.position_pit(2)+1.5*sin(-pi:0.1:pi),'r')
+    plot(gama_data.position_goal(1)+1.5*cos(-pi:0.1:pi),gama_data.position_goal(2)+1.5*sin(-pi:0.1:pi),'g')
 
 
     for i = 1:size(plot_color,1)
