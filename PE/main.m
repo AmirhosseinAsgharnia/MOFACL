@@ -7,7 +7,7 @@ rng(145)
 mkdir("Figs")
 %% simulation time parameters
 
-max_episode = 10000; % maximum times a whole game is played.
+max_episode = 2500; % maximum times a whole game is played.
 
 test_episode = 20; % each "test_episode" a test without noise is conducted.
 
@@ -39,9 +39,9 @@ gama_data.capture_radius = capture_radius;
 
 %% hyper parameters
 
-actor_learning_rate = 0.02;
+actor_learning_rate = 0.05;
 
-critic_learning_rate = 0.02;
+critic_learning_rate = 0.05;
 
 discount_factor = 0.5;
 
@@ -86,7 +86,7 @@ Fuzzy_test.input_bounds = [0 dimension*sqrt(2);0 dimension*sqrt(2);-pi pi];
 
 %% critic spaces
 
-critic.members = .1 * randn ( max_repo_member , number_of_objectives);
+critic.members = .1 * zeros ( max_repo_member , number_of_objectives);
 
 critic.index = 1 * ones ( max_repo_member , 1);
 % critic.label = 1:10;
@@ -126,9 +126,9 @@ test_count = 0;
 
 for episode = 1 : max_episode
 
-    sigma = sigma * 10 ^ (log10(0.2)/max_episode);
-    % actor_learning_rate  = actor_learning_rate * 10 ^ (log10(0.5)/max_episode);
-    % critic_learning_rate = critic_learning_rate * 10 ^ (log10(0.5)/max_episode);
+    % sigma = sigma * 10 ^ (log10(0.2)/max_episode);
+    actor_learning_rate  = actor_learning_rate * 10 ^ (log10(0.2)/max_episode);
+    critic_learning_rate = critic_learning_rate * 10 ^ (log10(0.2)/max_episode);
 
     terminate = 0;
     iteration = 0;
@@ -213,6 +213,8 @@ for episode = 1 : max_episode
         %% reward calculation
 
         [reward_1 , reward_2] = reward_function (iteration , position_agent , position_goal , position_pit);
+
+        
         %% calculating v_{t}
 
         v_weighted = zeros (numel(active_rules_1.act) , number_of_objectives );
@@ -324,9 +326,9 @@ for episode = 1 : max_episode
 
             not_front = find(critic(rule).index ~= 1);
             
-            for i = 1:numel(not_front)
-                critic(rule).members(i,:) = critic(rule).members(i,:) + critic_learning_rate * (critic(rule).members(1,:) - critic(rule).members(i,:));
-                actor(rule).members(i,:) = actor(rule).members(i,:) + actor_learning_rate * (actor(rule).members(1,:) - actor(rule).members(i,:));
+            for i = not_front
+                critic(rule).members(i,:) = critic(rule).members(i,:) + 0.1 * (critic(rule).members(1,:) - critic(rule).members(i,:));
+                actor(rule).members(i) = actor(rule).members(i) + 0.1 * (actor(rule).members(1) - actor(rule).members(i));
             end
             
             [critic , actor] = pareto_synthesizer (critic , actor , rule , max_repo_member);
