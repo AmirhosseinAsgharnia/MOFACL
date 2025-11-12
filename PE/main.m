@@ -19,6 +19,7 @@ max_iteration = max_time_horizon / step_time + 1;
 
 simulation_time = zeros (max_episode , 1);
 
+buffer_size = 250;
 %% game parameters
 
 dimension = 50;
@@ -131,12 +132,15 @@ empty.up = [];
 empty.r_1 = [];
 empty.r_2 = [];
 
-replay_buffer = repmat(empty,250 , 1);
+replay_buffer = repmat(empty, buffer_size , 1);
 %% training loop
 
 test_count = 0;
+rp = 0;
 
 for episode = 1 : max_episode
+    
+    
 
     sigma = sigma * 10 ^ (log10(0.2)/max_episode);
     actor_learning_rate  = actor_learning_rate * 10 ^ (log10(0.5)/max_episode);
@@ -148,11 +152,12 @@ for episode = 1 : max_episode
     %% episode simulation
 
     position_agent = zeros (max_iteration , 3);
-    % position_agent (1 , :) = [dimension * rand , dimension * rand , 2 * pi * rand - pi];
-    position_agent (1 , :) = [0 0 pi/4];
+    position_agent (1 , :) = [dimension * rand , dimension * rand , 2 * pi * rand - pi];
+    % position_agent (1 , :) = [0 0 pi/4];
     tic
     
     while ~terminate && iteration < max_iteration
+        rp = rp + 1;
 
         iteration = iteration + 1;
 
@@ -205,12 +210,28 @@ for episode = 1 : max_episode
 
         [reward_1 , reward_2] = reward_function (iteration , position_agent , position_goal , position_pit);
         
-        replay_buffer(rp).s_1 = [position_agent(iteration , 1) , position_agent(iteration , 2) , position_agent(iteration , 3)];
-        replay_buffer(rp).s_2 = [position_agent(iteration+1 , 1) , position_agent(iteration+1 , 2) , position_agent(iteration+1 , 3)];
+        %% Push data into replay buffer
+        
+        replay_buffer(2:buffer_size) = replay_buffer(1:buffer_size - 1);
 
-        replay_buffer(rp).u = u.res;
-        replay_buffer(rp).up = up;
+        replay_buffer(1).s_1 = [position_agent(iteration , 1) , position_agent(iteration , 2) , position_agent(iteration , 3)];
+        replay_buffer(1).s_2 = [position_agent(iteration+1 , 1) , position_agent(iteration+1 , 2) , position_agent(iteration+1 , 3)];
 
+        replay_buffer(1).u = u.res;
+        replay_buffer(1).up = up;
+
+        replay_buffer(1).r_1 = reward_1;
+        replay_buffer(1).r_2 = reward_2;
+        %% Trainer
+
+        if rp == buffer_size || mod(rp , 250) == 0
+            % Update Target
+            matrix_G = G_extractor (critic , angle_list);
+        end
+
+        if rp >= buffer_size
+            trainer;
+        end
 
     end
 

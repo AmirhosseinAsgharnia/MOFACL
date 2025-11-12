@@ -1,10 +1,8 @@
-function matrix_G = G_extractor (critic , active_rules , angle_list)
+function matrix_G = G_extractor (critic , angle_list)
 
-matrix_G = zeros( numel(active_rules.act) , 2 , numel(angle_list) );
+matrix_G = zeros( 125 , 2 , numel(angle_list) );
 
-i = 1;
-
-for rule = active_rules.act'
+for rule = 1:125
 
     for angle = 1:numel(angle_list)
 
@@ -14,11 +12,9 @@ for rule = active_rules.act'
 
         [~ , pareto_select] = min(D);
 
-        matrix_G (i , : , angle) = critic (rule).pareto (pareto_select , :);
+        matrix_G (rule , : , angle) = critic (rule).pareto (pareto_select , :);
 
     end
-
-    i = i + 1;
 
 end
 

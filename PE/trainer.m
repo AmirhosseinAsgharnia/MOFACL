@@ -1,6 +1,6 @@
 
 
-sample_list = randi([1 200],1,20);
+sample_list = randi([1 200],1,3);
 
 for sample = sample_list
     
@@ -18,7 +18,7 @@ for sample = sample_list
 
     active_rules_1 = fuzzy_engine_3 (S_1 , Fuzzy_test); % Just to check which rules are going be fired.
 
-    active_rules_2 = fuzzy_engine_3 ([position_agent(iteration + 1, 1) , position_agent(iteration + 1 , 2) , position_agent(iteration + 1 , 3)] , Fuzzy_test);
+    active_rules_2 = fuzzy_engine_3 (S_2 , Fuzzy_test);
 
     %% calculating v_{t}
 
@@ -50,7 +50,7 @@ for sample = sample_list
 
     %% calculating v_{t+1}
 
-    matrix_G = G_extractor (critic , active_rules_2 , angle_list);
+    % matrix_G = G_extractor (critic , active_rules_2 , angle_list);
 
     V_s_2 = zeros (number_of_angle , 2);
 
@@ -66,13 +66,13 @@ for sample = sample_list
 
         Fuzzy_critic.weights = zeros (number_of_rules , 1);
 
-        Fuzzy_critic.weights(active_rules_2.act , 1) = matrix_G (: , 1 , i);
+        Fuzzy_critic.weights(active_rules_2.act , 1) = matrix_G (active_rules_2.act , 1 , i);
 
         V_s_2 (i , 1) = fuzzy_engine_3 ( [position_agent(iteration + 1, 1) , position_agent(iteration + 1 , 2) , position_agent(iteration + 1 , 3)] , Fuzzy_critic ).res;
 
         Fuzzy_critic.weights = zeros (number_of_rules , 1);
 
-        Fuzzy_critic.weights(active_rules_2.act , 1) = matrix_G (: , 2 , i);
+        Fuzzy_critic.weights(active_rules_2.act , 1) = matrix_G (active_rules_2.act , 2 , i);
 
         V_s_2 (i , 2) = fuzzy_engine_3 ( [position_agent(iteration + 1, 1) , position_agent(iteration + 1 , 2) , position_agent(iteration + 1 , 3)] , Fuzzy_critic ).res;
 
