@@ -168,13 +168,6 @@ for episode = 1 : max_episode
 
         end
 
-        % for rule = active_rules_1.act'
-        % 
-        %     select = find(critic(rule).label == angle);
-        %     critic(rule).selected = select;
-        %     actor_output_parameters(rule) = actor(rule).members (critic(rule).selected);
-        % 
-        % end
         %% selecting action
 
         Fuzzy_actor.weights = actor_output_parameters;
@@ -195,13 +188,11 @@ for episode = 1 : max_episode
 
         terminate = termination (iteration , capture_radius , position_agent , position_goal , position_pit);
         
-
         %% fired rules (state s')
 
         Fuzzy_test.weights = zeros (number_of_rules , 1);
 
         active_rules_2 = fuzzy_engine_3 ([position_agent(iteration + 1, 1) , position_agent(iteration + 1 , 2) , position_agent(iteration + 1 , 3)] , Fuzzy_test);
-
 
         for rule = active_rules_2.act'
 
@@ -215,12 +206,14 @@ for episode = 1 : max_episode
         %% reward calculation
 
         [reward_1 , reward_2] = reward_function (iteration , position_agent , position_goal , position_pit);
-
-        if terminate == 1
-            reward_1 = +2;
-        elseif terminate == 2
-            reward_1 = -2;
-        end
+        
+        reward_1 = 0.8*reward_1 + 0.2*reward_2;
+        reward_2 = 0;
+        % if terminate == 1
+        %     reward_1 = +2;
+        % elseif terminate == 2
+        %     reward_1 = -2;
+        % end
         %% calculating v_{t}
 
         v_weighted = zeros (numel(active_rules_1.act) , number_of_objectives );
@@ -278,7 +271,7 @@ for episode = 1 : max_episode
         %% calculating temporal difference (Delta)
        
         Delta = [reward_1 , reward_2] + discount_factor * V_s_2 - V_s_1;        
-        
+    
         %% updating actor and critic
 
         firing_strength_counter = 0;
