@@ -206,11 +206,6 @@ for episode = 1 : max_episode
 
         [reward_1 , reward_2] = reward_function (iteration , position_agent , position_goal , position_pit);
 
-        if terminate == 1
-            reward_1 = +2;
-        elseif terminate == 2
-            reward_1 = -2;
-        end
         %% calculating v_{t}
 
         v_weighted = zeros (numel(active_rules_1.act) , number_of_objectives );
