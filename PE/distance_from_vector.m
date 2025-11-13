@@ -1,7 +1,9 @@
 function D = distance_from_vector(theta_R , origin , V )
 
-R_passive = [cos(theta_R) sin(theta_R);
-            -sin(theta_R) cos(theta_R)];
+theta = pi/2;
+
+R_passive = [cos(theta - theta_R) sin(theta - theta_R);
+            -sin(theta - theta_R) cos(theta - theta_R)];
 
 V_S1 = V' - origin';
 V_S2 =  R_passive * V_S1;

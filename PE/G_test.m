@@ -10,7 +10,7 @@ Selected_particles = zeros(number_of_rules , 5);
 
 for rule = 1 : number_of_rules
 
-    origin = critic (rule) . minimum_pareto;
+    origin = min(critic(rule).members);
 
     for i = [1 2 3 4 5]
         D = abs ( (critic (rule) . pareto (: , 1) - origin (1) ) * sin (angle_list(i)) - ...

@@ -108,7 +108,7 @@ for sample = sample_list
 
             critic(rule).members = [critic(rule).members ; New_critics];
 
-            [R_x , R_y] = delta_direction_calculator(angle_list(angle) , critic(rule).minimum_members , critic(rule).members(c_select(firing_strength_counter),:) , New_critics);
+            [R_x , R_y] = delta_direction_calculator(angle_list(angle) , critic(rule).maximum_members , critic(rule).members(c_select(firing_strength_counter),:) , New_critics);
 
             New_actors = actor(rule).members(c_select(firing_strength_counter)) +...
                 actor_learning_rate * sign(Up - U) * ( sign(R_x) * abs(Delta(i,1)) +  sign(R_y) * abs(Delta(i,2))) * active_rules_1.phi(firing_strength_counter);
@@ -135,8 +135,8 @@ for sample = sample_list
 
         [critic , actor] = pareto_synthesizer (critic , actor , rule , max_repo_member);
 
-        critic(rule).minimum_members = min (critic(rule).members , [] , 1);
-        critic(rule).minimum_pareto = min (critic(rule).pareto , [] , 1);
+        critic(rule).maximum_members = min (critic(rule).members , [] , 1);
+        critic(rule).maximum_pareto = min (critic(rule).pareto , [] , 1);
 
     end
 end

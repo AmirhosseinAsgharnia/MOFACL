@@ -87,17 +87,17 @@ Fuzzy_test.input_bounds = [0 dimension;0 dimension;-pi pi];
 
 %% critic spaces
 
-critic.members = .1 * zeros ( max_repo_member , number_of_objectives);
+critic.members = .1 * randn ( max_repo_member , number_of_objectives);
 
 critic.index = 1 * ones ( max_repo_member , 1);
 % critic.label = 1:10;
 critic.crowding_distance = 0 * ones ( max_repo_member , 1);
 
-critic.minimum_members = 0*ones ( 1 , number_of_objectives);
+critic.maximum_members = 0*ones ( 1 , number_of_objectives);
 
 critic.pareto = 0 * ones ( 1 , number_of_objectives);
 
-critic.minimum_pareto = 0*ones ( 1 , number_of_objectives);
+critic.maximum_pareto = 0*ones ( 1 , number_of_objectives);
 
 critic.selected = 1;
 
@@ -115,9 +115,9 @@ actor = repmat (actor , number_of_rules , 1);
 
 for rule = 1 : number_of_rules
 
-    critic(rule).minimum_pareto = min (critic(rule).pareto , [] , 1);
+    critic(rule).maximum_pareto = max (critic(rule).pareto , [] , 1);
 
-    critic(rule).minimum_members = min (critic(rule).members , [] , 1);
+    critic(rule).maximum_members = max (critic(rule).members , [] , 1);
 
 end
 
@@ -186,7 +186,7 @@ for episode = 1 : max_episode
             
             counter = counter + 1;
 
-            Distances = distance_from_vector( angle_list(angle), critic(rule).minimum_members , critic(rule).members );
+            Distances = distance_from_vector( angle_list(angle), critic(rule).maximum_members , critic(rule).members );
 
             [~,select] = min(Distances);
 
@@ -221,13 +221,6 @@ for episode = 1 : max_episode
         %% reward calculation
 
         [reward_1 , reward_2] = reward_function (iteration , position_agent , position_goal , position_pit);
-        % reward_1 = reward_1 * 0.7 + reward_2 * 0.3;
-        % reward_2 = 0;
-        % if terminate == 1
-        %     reward_1 = 2 + reward_1;
-        % elseif terminate == 2
-        %     reward_2 = -2 - reward_2;
-        % end
 
         %% Push data into replay buffer
         

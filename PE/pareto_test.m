@@ -27,7 +27,7 @@ for rule = Rules
 
     plot(critic(rule).members(:,1),critic(rule).members(:,2),'*b'); hold on
     plot(critic(rule).pareto(:,1),critic(rule).pareto(:,2),'*k')
-    plot(critic(rule).minimum_members(1),critic(rule).minimum_members(2),'*g')
+    plot(critic(rule).maximum_members(1),critic(rule).maximum_members(2),'*g')
     title(sprintf("Rule: %d",Rules(counter)))
 
     for member = 1:numel(critic(rule).pareto) / 2
