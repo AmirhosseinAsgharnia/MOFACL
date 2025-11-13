@@ -1,9 +1,13 @@
 
 
-sample_list = randi([1 200],1,3);
+sample_list = randi([1 1],1,2);
+
+if terminate == 1 || terminate == 2
+    sample_list = 1;
+end
 
 for sample = sample_list
-    
+
 
     S_1 = replay_buffer(sample).s_1;
     S_2 = replay_buffer(sample).s_2;
@@ -13,6 +17,12 @@ for sample = sample_list
 
     R_1 = replay_buffer(sample).r_1;
     R_2 = replay_buffer(sample).r_2;
+
+    T = replay_buffer(sample).terminate;
+
+    angle = replay_buffer(sample).angle;
+
+    c_select = replay_buffer(sample).select;
 
     Fuzzy_test.weights = zeros (number_of_rules , 1);
 
@@ -28,9 +38,9 @@ for sample = sample_list
 
     for rule = active_rules_1.act'
 
-        v_weighted(j , 1) = critic(rule).members(critic(rule).selected , 1);
+        v_weighted(j , 1) = critic(rule).members(c_select(j) , 1);
 
-        v_weighted(j , 2) = critic(rule).members(critic(rule).selected , 2);
+        v_weighted(j , 2) = critic(rule).members(c_select(j) , 2);
 
         j = j + 1;
 
@@ -42,49 +52,47 @@ for sample = sample_list
 
     Fuzzy_critic.weights(active_rules_1.act) = v_weighted (: , 1);
 
-    V_s_1 (1) = fuzzy_engine_3 ( [position_agent(iteration , 1) , position_agent(iteration , 2) , position_agent(iteration , 3)] , Fuzzy_critic ).res;
+    V_s_1 (1) = fuzzy_engine_3 ( S_1 , Fuzzy_critic ).res;
 
     Fuzzy_critic.weights(active_rules_1.act) = v_weighted (: , 2);
 
-    V_s_1 (2) = fuzzy_engine_3 ( [position_agent(iteration , 1) , position_agent(iteration , 2) , position_agent(iteration , 3)] , Fuzzy_critic ).res;
+    V_s_1 (2) = fuzzy_engine_3 ( S_1 , Fuzzy_critic ).res;
 
     %% calculating v_{t+1}
 
-    % matrix_G = G_extractor (critic , active_rules_2 , angle_list);
-
     V_s_2 = zeros (number_of_angle , 2);
 
-    if angle == 1
-        ang_list = [1 2];
-    elseif angle == 10
-        ang_list = [9 10];
-    else
-        ang_list = [angle-1,angle,angle+1];
-    end
+    % if angle == 1
+    %     ang_list = [1 2];
+    % elseif angle == 10
+    %     ang_list = [9 10];
+    % else
+    %     ang_list = [angle-1,angle,angle+1];
+    % end
 
-    for i = ang_list
+    for i = 1:number_of_angle
 
         Fuzzy_critic.weights = zeros (number_of_rules , 1);
 
         Fuzzy_critic.weights(active_rules_2.act , 1) = matrix_G (active_rules_2.act , 1 , i);
 
-        V_s_2 (i , 1) = fuzzy_engine_3 ( [position_agent(iteration + 1, 1) , position_agent(iteration + 1 , 2) , position_agent(iteration + 1 , 3)] , Fuzzy_critic ).res;
+        V_s_2 (i , 1) = fuzzy_engine_3 ( S_2 , Fuzzy_critic ).res;
 
         Fuzzy_critic.weights = zeros (number_of_rules , 1);
 
         Fuzzy_critic.weights(active_rules_2.act , 1) = matrix_G (active_rules_2.act , 2 , i);
 
-        V_s_2 (i , 2) = fuzzy_engine_3 ( [position_agent(iteration + 1, 1) , position_agent(iteration + 1 , 2) , position_agent(iteration + 1 , 3)] , Fuzzy_critic ).res;
+        V_s_2 (i , 2) = fuzzy_engine_3 ( S_2 , Fuzzy_critic ).res;
 
     end
 
-    if terminate
+    if T~=0
         V_s_2 = V_s_2 * 0;
     end
 
     %% calculating temporal difference (Delta)
 
-    Delta = [reward_1 , reward_2] + discount_factor * V_s_2 - V_s_1;
+    Delta = [R_1 , R_2] + discount_factor * V_s_2 - V_s_1;
 
     %% updating actor and critic
 
@@ -94,15 +102,16 @@ for sample = sample_list
 
         firing_strength_counter = firing_strength_counter + 1;
 
-        for i = ang_list
+        for i = 1:number_of_angle
 
-            New_critics = critic(rule).members(critic(rule).selected,:) + critic_learning_rate * Delta(i , :) * active_rules_1.phi(firing_strength_counter);
+            New_critics = critic(rule).members(c_select(firing_strength_counter),:) + critic_learning_rate * Delta(i , :) * active_rules_1.phi(firing_strength_counter);
 
             critic(rule).members = [critic(rule).members ; New_critics];
 
-            [R_x , R_y] = delta_direction_calculator(angle_list(angle) , critic(rule).minimum_members , critic(rule).members(critic(rule).selected,:) , New_critics);
+            [R_x , R_y] = delta_direction_calculator(angle_list(angle) , critic(rule).minimum_members , critic(rule).members(c_select(firing_strength_counter),:) , New_critics);
 
-            New_actors = actor(rule).members(critic(rule).selected) + actor_learning_rate * sign(up - u.res) * ( sign(R_x) * abs(Delta(i,1)) +  sign(R_y) * abs(Delta(i,2))) * active_rules_1.phi(firing_strength_counter);
+            New_actors = actor(rule).members(c_select(firing_strength_counter)) +...
+                actor_learning_rate * sign(Up - U) * ( sign(R_x) * abs(Delta(i,1)) +  sign(R_y) * abs(Delta(i,2))) * active_rules_1.phi(firing_strength_counter);
 
             New_actors = max(min(New_actors , pi/6) , -pi/6);
 
@@ -111,12 +120,13 @@ for sample = sample_list
             critic(rule).index = [critic(rule).index ; 0];
 
             critic(rule).crowding_distance = [critic(rule).crowding_distance ; 0];
+
         end
 
-        critic(rule).members(critic(rule).selected,:) = [];
-        actor(rule).members(critic(rule).selected) = [];
-        critic(rule).crowding_distance(critic(rule).selected) = [];
-        critic(rule).index(critic(rule).selected) = [];
+        critic(rule).members(c_select(firing_strength_counter),:) = [];
+        actor(rule).members(c_select(firing_strength_counter)) = [];
+        critic(rule).crowding_distance(c_select(firing_strength_counter)) = [];
+        critic(rule).index(c_select(firing_strength_counter)) = [];
 
         [critic(rule).members , unique_index] = unique(critic(rule).members , "rows");
         actor(rule).members = actor(rule).members(unique_index);

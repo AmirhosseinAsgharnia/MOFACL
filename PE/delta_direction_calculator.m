@@ -43,15 +43,15 @@ function [R_x , R_y] = delta_direction_calculator(theta_R , origin , V1 , V2)
 R_passive = [cos(theta_R) sin(theta_R);
             -sin(theta_R) cos(theta_R)];
 
-V1_S1 = V1 - origin;
-V2_S1 = V2 - origin;
+V1_S1 = V1 - origin';
+V2_S1 = V2 - origin';
 
 % quiver(V1(1) , V1(2) , V2(1) - V1(1) , V2(2) - V1(2) , 0, 'r');
 % plot(V1(1),V1(2),"xk")
 % plot(V2(1),V2(2),"xk")
 
-V1_S2 =  R_passive * V1_S1';
-V2_S2 =  R_passive * V2_S1';
+V1_S2 =  R_passive * V1_S1;
+V2_S2 =  R_passive * V2_S1;
 
 %%
 

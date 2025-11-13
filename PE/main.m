@@ -19,7 +19,7 @@ max_iteration = max_time_horizon / step_time + 1;
 
 simulation_time = zeros (max_episode , 1);
 
-buffer_size = 250;
+buffer_size = 50;
 %% game parameters
 
 dimension = 50;
@@ -40,9 +40,9 @@ gama_data.capture_radius = capture_radius;
 
 %% hyper parameters
 
-actor_learning_rate = 0.05;
+actor_learning_rate = 0.01;
 
-critic_learning_rate = 0.05;
+critic_learning_rate = 0.01;
 
 discount_factor = 0.5;
 
@@ -52,7 +52,7 @@ max_repo_member = 10;
 
 angle_list = linspace (0 , pi/2 , number_of_angle);
 
-sigma = 0.5;
+sigma = 1;
 
 %% algorithm parameters
 
@@ -132,6 +132,12 @@ empty.up = [];
 empty.r_1 = [];
 empty.r_2 = [];
 
+empty.select = [];
+
+empty.terminate = [];
+
+empty.angle = [];
+
 replay_buffer = repmat(empty, buffer_size , 1);
 %% training loop
 
@@ -142,9 +148,9 @@ for episode = 1 : max_episode
     
     
 
-    sigma = sigma * 10 ^ (log10(0.2)/max_episode);
-    actor_learning_rate  = actor_learning_rate * 10 ^ (log10(0.5)/max_episode);
-    critic_learning_rate = critic_learning_rate * 10 ^ (log10(0.5)/max_episode);
+    % sigma = sigma * 10 ^ (log10(0.2)/max_episode);
+    % actor_learning_rate  = actor_learning_rate * 10 ^ (log10(0.5)/max_episode);
+    % critic_learning_rate = critic_learning_rate * 10 ^ (log10(0.5)/max_episode);
 
     terminate = 0;
     iteration = 0;
@@ -152,8 +158,8 @@ for episode = 1 : max_episode
     %% episode simulation
 
     position_agent = zeros (max_iteration , 3);
-    position_agent (1 , :) = [dimension * rand , dimension * rand , 2 * pi * rand - pi];
-    % position_agent (1 , :) = [0 0 pi/4];
+    % position_agent (1 , :) = [dimension * rand , dimension * rand , 2 * pi * rand - pi];
+    position_agent (1 , :) = [0 0 pi/4];
     tic
     
     while ~terminate && iteration < max_iteration
@@ -169,11 +175,16 @@ for episode = 1 : max_episode
 
         %% pre-processing the rule-base and exploration - exploitation (distance from origin) (ND is applyed before!)
         
-        if mod(iteration , 5) == 0 || iteration == 1
-            angle = randi ([1 number_of_angle]);
-        end
-        
+        % if mod(iteration , 5) == 0 || iteration == 1
+        angle = randi ([1 number_of_angle]);
+        % end
+
+        C_select = zeros(8 , 1);
+
+        counter = 0;
         for rule = active_rules_1.act'
+            
+            counter = counter + 1;
 
             Distances = distance_from_vector( angle_list(angle), critic(rule).minimum_members , critic(rule).members );
 
@@ -182,7 +193,8 @@ for episode = 1 : max_episode
             critic(rule).selected = select;
 
             actor_output_parameters(rule) = actor(rule).members (critic(rule).selected);
-
+            
+            C_select(counter) = select;
         end
 
         %% selecting action
@@ -209,7 +221,14 @@ for episode = 1 : max_episode
         %% reward calculation
 
         [reward_1 , reward_2] = reward_function (iteration , position_agent , position_goal , position_pit);
-        
+        % reward_1 = reward_1 * 0.7 + reward_2 * 0.3;
+        % reward_2 = 0;
+        % if terminate == 1
+        %     reward_1 = 2 + reward_1;
+        % elseif terminate == 2
+        %     reward_2 = -2 - reward_2;
+        % end
+
         %% Push data into replay buffer
         
         replay_buffer(2:buffer_size) = replay_buffer(1:buffer_size - 1);
@@ -222,16 +241,22 @@ for episode = 1 : max_episode
 
         replay_buffer(1).r_1 = reward_1;
         replay_buffer(1).r_2 = reward_2;
+
+        replay_buffer(1).terminate = terminate;
+
+        replay_buffer(1).select = C_select;
+
+        replay_buffer(1).angle = angle;
+
         %% Trainer
 
-        if rp == buffer_size || mod(rp , 250) == 0
-            % Update Target
+        % if rp == buffer_size || mod(rp , 50) == 0
             matrix_G = G_extractor (critic , angle_list);
-        end
+        % end
 
-        if rp >= buffer_size
+        % if rp >= buffer_size
             trainer;
-        end
+        % end
 
     end
 
