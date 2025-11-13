@@ -87,7 +87,7 @@ Fuzzy_test.input_bounds = [0 dimension;0 dimension;-pi pi];
 
 %% critic spaces
 
-critic.members = .1 * randn ( max_repo_member , number_of_objectives);
+critic.members = .1 * zeros ( max_repo_member , number_of_objectives);
 
 critic.index = 1 * ones ( max_repo_member , 1);
 % critic.label = 1:10;
@@ -221,7 +221,9 @@ for episode = 1 : max_episode
         %% reward calculation
 
         [reward_1 , reward_2] = reward_function (iteration , position_agent , position_goal , position_pit);
-
+        
+        reward_1 = 0.8*reward_1 + 0.2*reward_2;
+        reward_2 = 0;
         %% Push data into replay buffer
         
         replay_buffer(2:buffer_size) = replay_buffer(1:buffer_size - 1);
@@ -243,13 +245,13 @@ for episode = 1 : max_episode
 
         %% Trainer
 
-        % if rp == buffer_size || mod(rp , 50) == 0
+        if rp == buffer_size || mod(rp , 50) == 0
             matrix_G = G_extractor (critic , angle_list);
-        % end
+        end
 
-        % if rp >= buffer_size
+        if rp >= buffer_size
             trainer;
-        % end
+        end
 
     end
 

@@ -1,6 +1,6 @@
 
 
-sample_list = randi([1 1],1,2);
+sample_list = randi([1 1],1,1);
 
 if terminate == 1 || terminate == 2
     sample_list = 1;
@@ -111,7 +111,7 @@ for sample = sample_list
             [R_x , R_y] = delta_direction_calculator(angle_list(angle) , critic(rule).maximum_members , critic(rule).members(c_select(firing_strength_counter),:) , New_critics);
 
             New_actors = actor(rule).members(c_select(firing_strength_counter)) +...
-                actor_learning_rate * sign(Up - U) * ( sign(R_x) * abs(Delta(i,1)) +  sign(R_y) * abs(Delta(i,2))) * active_rules_1.phi(firing_strength_counter);
+                actor_learning_rate * sign(Up - U) * ( Delta(i,1)*sin(angle_list(i)) +  Delta(i,2)*cos(angle_list(i))) * active_rules_1.phi(firing_strength_counter);
 
             New_actors = max(min(New_actors , pi/6) , -pi/6);
 
@@ -135,8 +135,8 @@ for sample = sample_list
 
         [critic , actor] = pareto_synthesizer (critic , actor , rule , max_repo_member);
 
-        critic(rule).maximum_members = min (critic(rule).members , [] , 1);
-        critic(rule).maximum_pareto = min (critic(rule).pareto , [] , 1);
+        critic(rule).maximum_members = max (critic(rule).members , [] , 1);
+        critic(rule).maximum_pareto = max (critic(rule).pareto , [] , 1);
 
     end
 end
