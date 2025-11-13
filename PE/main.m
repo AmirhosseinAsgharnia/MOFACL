@@ -126,9 +126,9 @@ test_count = 0;
 
 for episode = 1 : max_episode
 
-    sigma = sigma * 10 ^ (log10(0.2)/max_episode);
-    actor_learning_rate  = actor_learning_rate * 10 ^ (log10(0.5)/max_episode);
-    critic_learning_rate = critic_learning_rate * 10 ^ (log10(0.5)/max_episode);
+    % sigma = sigma * 10 ^ (log10(0.2)/max_episode);
+    % actor_learning_rate  = actor_learning_rate * 10 ^ (log10(0.5)/max_episode);
+    % critic_learning_rate = critic_learning_rate * 10 ^ (log10(0.5)/max_episode);
 
     terminate = 0;
     iteration = 0;
