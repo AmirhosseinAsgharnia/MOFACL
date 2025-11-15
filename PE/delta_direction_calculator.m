@@ -56,4 +56,6 @@ V2_S2 =  R_passive * V2_S1';
 %%
 
 R_x = V2_S2(1) - V1_S2(1);
-R_y = abs(V1_S2(2)) - abs(V2_S2(2));
+R_y = V2_S2(2) - V1_S2(2);
+
+% R_y = abs(V1_S2(2)) - abs(V2_S2(2));

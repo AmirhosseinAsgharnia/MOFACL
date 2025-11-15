@@ -86,10 +86,10 @@ Fuzzy_test.input_bounds = [0 dimension;0 dimension;-pi pi];
 
 %% critic spaces
 
-critic.members = .1 * zeros ( max_repo_member , number_of_objectives);
+critic.members = 0.2 * ones ( max_repo_member , number_of_objectives);
 
 critic.index = 1 * ones ( max_repo_member , 1);
-% critic.label = 1:10;
+
 critic.crowding_distance = 0 * ones ( max_repo_member , 1);
 
 critic.minimum_members = 0*ones ( 1 , number_of_objectives);
@@ -114,9 +114,9 @@ actor = repmat (actor , number_of_rules , 1);
 
 for rule = 1 : number_of_rules
 
-    critic(rule).minimum_pareto = min (critic(rule).pareto , [] , 1);
+    critic(rule).minimum_pareto = [10 10];
 
-    critic(rule).minimum_members = min (critic(rule).members , [] , 1);
+    critic(rule).minimum_members = [10 10];
 
 end
 
@@ -152,10 +152,15 @@ for episode = 1 : max_episode
 
         %% pre-processing the rule-base and exploration - exploitation (distance from origin) (ND is applyed before!)
         
-        if mod(iteration , 5) == 0 || iteration == 1
+        if mod(iteration , 10) == 0 || iteration == 1
             angle = randi ([1 number_of_angle]);
         end
         
+        % if episode > 400
+        %     sigma = 0;
+        %     angle = 2;
+        % end
+
         for rule = active_rules_1.act'
 
             Distances = distance_from_vector( angle_list(angle), critic(rule).minimum_members , critic(rule).members );
@@ -205,7 +210,17 @@ for episode = 1 : max_episode
         %% reward calculation
 
         [reward_1 , reward_2] = reward_function (iteration , position_agent , position_goal , position_pit);
-
+        
+        if terminate == 1
+            reward_1 = 10;
+            reward_2 = 10;
+        elseif terminate == 2
+            reward_2 = -10;
+            reward_1 = -10;
+        end
+        
+        % reward_1 = 0.8*reward_1 + 0.2*reward_2;
+        % reward_2 = 0;
         %% calculating v_{t}
 
         v_weighted = zeros (numel(active_rules_1.act) , number_of_objectives );
@@ -239,13 +254,13 @@ for episode = 1 : max_episode
         matrix_G = G_extractor (critic , active_rules_2 , angle_list);
 
         V_s_2 = zeros (number_of_angle , 2);
-        
+        % ang_list = 1:number_of_angle;
         if angle == 1
-            ang_list = [1 2];
+            ang_list = [1 10];
         elseif angle == 10
-            ang_list = [9 10];
+            ang_list = [1 10];
         else
-            ang_list = [angle-1,angle,angle+1];
+            ang_list = [1,angle,10];
         end
 
         for i = ang_list
@@ -277,8 +292,12 @@ for episode = 1 : max_episode
         firing_strength_counter = 0;
 
         for rule = active_rules_1.act'
-
+            
             firing_strength_counter = firing_strength_counter + 1;
+            
+            if active_rules_1.phi(firing_strength_counter) == 0
+                continue
+            end
 
             for i = ang_list
                 
@@ -286,9 +305,15 @@ for episode = 1 : max_episode
             
                 critic(rule).members = [critic(rule).members ; New_critics];
 
-                [R_x , R_y] = delta_direction_calculator(angle_list(angle) , critic(rule).minimum_members , critic(rule).members(critic(rule).selected,:) , New_critics);
+                [R_x , R_y] = delta_direction_calculator(angle_list(i) , critic(rule).minimum_members , critic(rule).members(critic(rule).selected,:) , New_critics);
                 
-                New_actors = actor(rule).members(critic(rule).selected) + actor_learning_rate * sign(up - u.res) * ( sign(R_x) * abs(Delta(i,1)) +  sign(R_y) * abs(Delta(i,2))) * active_rules_1.phi(firing_strength_counter);
+                R_1 = abs(R_x) / (abs(R_x) + abs(R_y));
+                R_2 = abs(R_y) / (abs(R_x) + abs(R_y));
+
+                New_actors = actor(rule).members(critic(rule).selected) +...
+                    1*actor_learning_rate * sign(up - u.res) *  ( sign(R_x) + 0.1*sign(R_y) ) * active_rules_1.phi(firing_strength_counter);
+                dummy = Delta(i,:);
+                % New_actors = actor(rule).members(critic(rule).selected) + actor_learning_rate * sign(up - u.res) * ( Delta(i,1) +  Delta(i,2)) * active_rules_1.phi(firing_strength_counter);
 
                 New_actors = max(min(New_actors , pi/6) , -pi/6);
 
@@ -310,9 +335,15 @@ for episode = 1 : max_episode
             critic(rule).index = critic(rule).index(unique_index);
 
             [critic , actor] = pareto_synthesizer (critic , actor , rule , max_repo_member);
+            
+            min_member = min (critic(rule).members , [] , 1);
+            min_pareto = min (critic(rule).pareto , [] , 1);
 
-            critic(rule).minimum_members = min (critic(rule).members , [] , 1);
-            critic(rule).minimum_pareto = min (critic(rule).pareto , [] , 1);
+            critic(rule).minimum_members = min (critic(rule).minimum_members , min_member);
+            critic(rule).minimum_pareto = min (critic(rule).minimum_pareto , min_pareto);
+
+            % critic(rule).minimum_members = (1 - 0.0001)* critic(rule).minimum_members + 0.0001 * min_member;
+            % critic(rule).minimum_pareto = (1 - 0.0001)* critic(rule).minimum_pareto + 0.0001 * min_pareto;
 
         end
     end
