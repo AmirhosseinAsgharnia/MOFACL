@@ -23,7 +23,7 @@ simulation_time = zeros (max_episode , 1);
 
 dimension = 50;
 
-speed = 5; % speed of the agent (units/sec)
+speed = 1; % speed of the agent (units/sec)
 
 position_goal = [40 , 40];
 
@@ -43,7 +43,7 @@ actor_learning_rate = 0.02;
 
 critic_learning_rate = 0.02;
 
-discount_factor = 0.5;
+discount_factor = 0.9;
 
 number_of_angle = 10;
 
@@ -137,8 +137,8 @@ for episode = 1 : max_episode
     %% episode simulation
 
     position_agent = zeros (max_iteration , 3);
-    position_agent (1 , :) = [dimension * rand , dimension * rand , 2 * pi * rand - pi];
-    % position_agent (1 , :) = [0 0 pi/4];
+    % position_agent (1 , :) = [dimension * rand , dimension * rand , 2 * pi * rand - pi];
+    position_agent (1 , :) = [0 0 pi/4];
     tic
     
     while ~terminate && iteration < max_iteration
@@ -199,7 +199,7 @@ for episode = 1 : max_episode
 
         [reward_1 , reward_2] = reward_function (iteration , position_agent , position_goal , position_pit);
         
-        reward_1 = 0.8 * reward_1 + 0.2 * reward_2;
+        reward_1 = 0.6 * reward_1 + 0.4 * reward_2;
         reward_2 = 0;
         %% calculating v_{t}
 
