@@ -1,6 +1,6 @@
 function pareto_test (critic , actor , episode )
 
-Rules = [38 63 43 68 39 64];
+Rules = [51 76 82 57 87 88];
 
 fig = figure('Visible','off');
 
@@ -39,8 +39,8 @@ for rule = Rules
     
     grid minor
 
-    % xlim([-1  1])
-    % ylim([-1  1])
+    xlim([-1  2])
+    ylim([-1  2])
 end
 
 

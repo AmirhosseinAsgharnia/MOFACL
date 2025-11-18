@@ -27,7 +27,7 @@ for num = 1:5
 
     step_time = 0.1;
 
-    capture_radius = 3;
+    capture_radius = gama_data.capture_radius;
 
     position_agent = zeros (max_iteration , 3);
 
@@ -85,8 +85,8 @@ for num = 1:5
 
     plot([0 0 gama_data.dimension gama_data.dimension 0],[0 gama_data.dimension gama_data.dimension 0 0],'--k')
     hold on
-    plot(gama_data.position_pit(1)+3*cos(-pi:0.1:pi),gama_data.position_pit(2)+3*sin(-pi:0.1:pi),'r')
-    plot(gama_data.position_goal(1)+3*cos(-pi:0.1:pi),gama_data.position_goal(2)+3*sin(-pi:0.1:pi),'g')
+    plot(gama_data.position_pit(1)+gama_data.capture_radius*cos(-pi:0.1:pi),gama_data.position_pit(2)+gama_data.capture_radius*sin(-pi:0.1:pi),'r')
+    plot(gama_data.position_goal(1)+gama_data.capture_radius*cos(-pi:0.1:pi),gama_data.position_goal(2)+gama_data.capture_radius*sin(-pi:0.1:pi),'g')
 
 
     for i = 1:size(plot_color,1)
