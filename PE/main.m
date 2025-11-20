@@ -39,19 +39,19 @@ gama_data.capture_radius = capture_radius;
 
 %% hyper parameters
 
-actor_learning_rate = 0.0125;
+actor_learning_rate = 0.05;
 
-critic_learning_rate = 0.025;
+critic_learning_rate = 0.05;
 
 discount_factor = 0.9;
 
-number_of_angle = 5;
+number_of_angle = 7;
 
 max_repo_member = 10;
 
 angle_list = linspace (0 , pi/2 , number_of_angle);
 
-sigma = 0.5;
+sigma = 0.75;
 
 %% algorithm parameters
 
@@ -128,7 +128,7 @@ test_count = 0;
 
 for episode = 1 : max_episode
 
-    % sigma = sigma * 10 ^ (log10(0.1)/max_episode);
+    % sigma = sigma * 10 ^ (log10(0.5)/max_episode);
     % actor_learning_rate  = actor_learning_rate * 10 ^ (log10(0.5)/max_episode);
     % critic_learning_rate = critic_learning_rate * 10 ^ (log10(0.5)/max_episode);
 
@@ -138,9 +138,9 @@ for episode = 1 : max_episode
     %% episode simulation
 
     position_agent = zeros (max_iteration , 3);
-    % position_agent (1 , :) = [dimension * rand , dimension * rand , 2 * pi * rand - pi];
+    position_agent (1 , :) = [dimension * rand , dimension * rand , 2 * pi * rand - pi];
 
-    position_agent (1 , :) = [0 0 pi/4];
+    % position_agent (1 , :) = [0 0 pi/4];
 
     tic
     while ~terminate && iteration < max_iteration
@@ -155,7 +155,7 @@ for episode = 1 : max_episode
 
         %% pre-processing the rule-base and exploration - exploitation (distance from origin) (ND is applyed before!)
         
-        if mod(iteration , 5) == 0 || iteration == 1
+        if mod(iteration , 1) == 0 || iteration == 1
             angle = randi ([1 number_of_angle]);
         end
 
