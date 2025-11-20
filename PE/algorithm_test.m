@@ -23,7 +23,7 @@ for num = 1:5
 
     Fuzzy_actor_s.weights = Fuzzy_actor.weights(: , num);
 
-    max_iteration = 200;
+    max_iteration = 400;
 
     step_time = 0.1;
 

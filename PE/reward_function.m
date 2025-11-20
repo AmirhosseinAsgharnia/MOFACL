@@ -6,5 +6,7 @@ reward_1 = distance_real (position_agent (iteration , 1:2) , position_goal) - di
 
 reward_2 = distance_real (position_agent (iteration + 1 , 1:2) , position_pit) - distance_real (position_agent (iteration , 1:2) , position_pit);
 
+% reward_2 = 0.5*reward_2;
+
 % reward_1 = fun(reward_1);
 % reward_2 = fun(reward_2);

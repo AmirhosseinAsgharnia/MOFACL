@@ -1,14 +1,14 @@
 function pareto_test (critic , actor , episode )
 
-Rules = [51 76 82 57 87 88];
+Rules = [76 81 82 87 62 63 64 59];
 
 fig = figure('Visible','off');
 
 set(fig, ...
     'Units',        'inches', ...
-    'Position',     [0 0 7 4], ...
+    'Position',     [0 0 7 6], ...
     'PaperUnits',   'inches', ...
-    'PaperPosition',[0 0 7 4] ...
+    'PaperPosition',[0 0 7 6] ...
     );
 
 set(fig,'defaultaxesfontsize',6)
@@ -23,7 +23,7 @@ for rule = Rules
 
     counter = counter + 1;
 
-    subplot(2 , 3 , counter)
+    subplot(3 , 3 , counter)
 
     plot(critic(rule).members(:,1),critic(rule).members(:,2),'*b'); hold on
     plot(critic(rule).pareto(:,1),critic(rule).pareto(:,2),'*k')
@@ -39,8 +39,8 @@ for rule = Rules
     
     grid minor
 
-    xlim([-1  2])
-    ylim([-1  2])
+    xlim([-3  2])
+    ylim([-3  2])
 end
 
 

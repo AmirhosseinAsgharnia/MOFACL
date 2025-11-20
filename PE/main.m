@@ -39,19 +39,19 @@ gama_data.capture_radius = capture_radius;
 
 %% hyper parameters
 
-actor_learning_rate = 0.05;
+actor_learning_rate = 0.0125;
 
-critic_learning_rate = 0.05;
+critic_learning_rate = 0.025;
 
-discount_factor = 0.5;
+discount_factor = 0.9;
 
-number_of_angle = 7;
+number_of_angle = 5;
 
 max_repo_member = 10;
 
 angle_list = linspace (0 , pi/2 , number_of_angle);
 
-sigma = 1;
+sigma = 0.5;
 
 %% algorithm parameters
 
@@ -86,7 +86,7 @@ Fuzzy_test.input_bounds = [0 dimension;0 dimension;-pi pi];
 
 %% critic spaces
 
-critic.members = 0 * randn ( max_repo_member , number_of_objectives);
+critic.members = 0 * zeros ( max_repo_member , number_of_objectives);
 
 critic.index = 1 * ones ( max_repo_member , 1);
 
@@ -94,7 +94,7 @@ critic.crowding_distance = 0 * ones ( max_repo_member , 1);
 
 critic.minimum_members = 0*ones ( 1 , number_of_objectives);
 
-critic.pareto = 0.2 * ones ( 1 , number_of_objectives);
+critic.pareto = critic.members(1,:);
 
 critic.minimum_pareto = 0*ones ( 1 , number_of_objectives);
 
@@ -155,15 +155,19 @@ for episode = 1 : max_episode
 
         %% pre-processing the rule-base and exploration - exploitation (distance from origin) (ND is applyed before!)
         
-        if mod(iteration , 1) == 0 || iteration == 1
+        if mod(iteration , 5) == 0 || iteration == 1
             angle = randi ([1 number_of_angle]);
         end
-        angle = 1;
+
         for rule = active_rules_1.act'
 
             Distances = distance_from_vector( angle_list(angle), critic(rule).minimum_members , critic(rule).members );
 
             [~,select] = min(Distances);
+
+            if sum(critic(rule).members(select,:) == critic(rule).minimum_members) == 2
+                select = randi([1,numel(Distances)]);
+            end
 
             critic(rule).selected = select;
 
@@ -200,8 +204,15 @@ for episode = 1 : max_episode
         %% reward calculation
 
         [reward_1 , reward_2] = reward_function (iteration , position_agent , position_goal , position_pit);
-        reward_1 = reward_1*0.7 + 0.3*reward_2;
-        reward_2 = 0;
+        
+        % if episode >100
+        %     reward_2 = reward_2 - 0.5;
+        %     reward_1 = reward_1 - 0.5;
+        % end
+
+        % reward_1 = reward_1*0.7 + 0.3*reward_2;
+        % reward_2 = 0;
+        
         % if terminate == 1
         %     reward_1 = 1;
         %     reward_2 = 1;
@@ -238,6 +249,44 @@ for episode = 1 : max_episode
 
         V_s_1 (2) = fuzzy_engine_3 ( [position_agent(iteration , 1) , position_agent(iteration , 2) , position_agent(iteration , 3)] , Fuzzy_critic ).res;
 
+        %% calculating v_{t}
+
+        % matrix_G = G_extractor (critic , active_rules_1 , angle_list);
+        % 
+        % V_s_1 = zeros (number_of_angle , 2);
+        % 
+        % if angle == 1
+        % 
+        %     ang_list = [1 2];
+        % 
+        % elseif angle == number_of_angle
+        % 
+        %     ang_list = [number_of_angle number_of_angle-1];
+        % 
+        % else
+        % 
+        %     ang_list = [angle , angle - 1 , angle + 1];
+        % 
+        % end
+        % 
+        % 
+        % for i = ang_list
+        % 
+        %     Fuzzy_critic.weights = zeros (number_of_rules , 1);
+        % 
+        %     Fuzzy_critic.weights(active_rules_1.act , 1) = matrix_G (: , 1 , i);
+        % 
+        %     V_s_1 (i , 1) = fuzzy_engine_3 ( [position_agent(iteration , 1) , position_agent(iteration  , 2) , position_agent(iteration  , 3)] , Fuzzy_critic ).res;
+        % 
+        %     Fuzzy_critic.weights = zeros (number_of_rules , 1);
+        % 
+        %     Fuzzy_critic.weights(active_rules_1.act , 1) = matrix_G (: , 2 , i);
+        % 
+        %     V_s_1 (i , 2) = fuzzy_engine_3 ( [position_agent(iteration , 1) , position_agent(iteration , 2) , position_agent(iteration , 3)] , Fuzzy_critic ).res;
+        % 
+        % end
+        
+        
         %% calculating v_{t+1}
 
         matrix_G = G_extractor (critic , active_rules_2 , angle_list);
@@ -246,11 +295,11 @@ for episode = 1 : max_episode
 
         if angle == 1
 
-            ang_list = 1;
+            ang_list = [1 2];
 
         elseif angle == number_of_angle
 
-            ang_list = number_of_angle;
+            ang_list = [number_of_angle number_of_angle-1];
 
         else
 
@@ -296,8 +345,8 @@ for episode = 1 : max_episode
             end
 
             for i = ang_list
-                
-                New_critics = critic(rule).members(critic(rule).selected,:) + critic_learning_rate * Delta(i , :) * active_rules_1.phi(firing_strength_counter);
+
+                New_critics = critic(rule).members(critic(rule).selected,:) + critic_learning_rate * [Delta(i , 1) Delta(i , 2)] * active_rules_1.phi(firing_strength_counter);
             
                 critic(rule).members = [critic(rule).members ; New_critics];
 
@@ -307,7 +356,7 @@ for episode = 1 : max_episode
                 R_2 = abs(R_y) / (abs(R_x) + abs(R_y));
 
                 New_actors = actor(rule).members(critic(rule).selected) +...
-                    1*actor_learning_rate * sign(up - u.res) *  ( Delta(i,1)* cos(angle_list(i)) + Delta(i,2) * sin(angle_list(i)) ) * active_rules_1.phi(firing_strength_counter);
+                    2*actor_learning_rate * (up - u.res) *( Delta(i,1)* cos(angle_list(i)) + Delta(i,2) * sin(angle_list(i)) ) * active_rules_1.phi(firing_strength_counter);
                 
                 dummy = Delta(i,:);
 

@@ -56,26 +56,46 @@ for pareto_front = 1 : maximum_pareto_front
     crowding_distance = crowding_distance_eval (members);
     
     [~ , sort_index] = sort(crowding_distance , 'descend');
+    
+    % if numel(sort_index) > 2
+    % 
+    %     sort_index = [1;numel(sort_index);randi([2,numel(sort_index)-1],numel(sort_index)-2,1)];
+    % 
+    % end
 
     critic(rule).crowding_distance(min(member_index):max(member_index)) = crowding_distance(sort_index);
 
     critic(rule).members(min(member_index):max(member_index),:) = members(sort_index,:);
-    
-    % critic(rule).label(min(member_index):max(member_index)) = label(sort_index);
 
     actor(rule).members(min(member_index):max(member_index)) = members_actor(sort_index);
 
 end
+
+%% First pareto
+
+% t = find(critic(rule).index ~= 1);
+% actor_member = actor(rule).members(t);
+% critic_member = critic(rule).members(t,:);
+% critic_index = critic(rule).index(t);
+% crowding_distance = critic(rule).crowding_distance(t);
+
 
 if numel(actor(rule).members) > max_repo_member
     
     actor(rule).members = actor(rule).members(1:max_repo_member);
     critic(rule).members = critic(rule).members(1:max_repo_member,:);
     critic(rule).index = critic(rule).index(1:max_repo_member);
-    % critic(rule).label = critic(rule).label(1:max_repo_member); % Added New
     critic(rule).crowding_distance = critic(rule).crowding_distance(1:max_repo_member);
 
 end
+
+% s = numel(actor_member);
+
+% actor(rule).members = [actor(rule).members;actor_member(1:min(numel(t),3))];
+% critic(rule).members= [critic(rule).members;critic_member(1:min(numel(t),3),:)];
+% critic(rule).index = [critic(rule).index;critic_index(1:min(numel(t),3))];
+% critic(rule).crowding_distance = [critic(rule).crowding_distance;crowding_distance(1:min(numel(t),3))]; 
+
 
 pareto_index = find(critic(rule).index == 1);
 critic(rule).pareto = critic(rule).members(pareto_index , :);
