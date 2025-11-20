@@ -204,22 +204,6 @@ for episode = 1 : max_episode
         %% reward calculation
 
         [reward_1 , reward_2] = reward_function (iteration , position_agent , position_goal , position_pit);
-        
-        % if episode >100
-        %     reward_2 = reward_2 - 0.5;
-        %     reward_1 = reward_1 - 0.5;
-        % end
-
-        % reward_1 = reward_1*0.7 + 0.3*reward_2;
-        % reward_2 = 0;
-        
-        % if terminate == 1
-        %     reward_1 = 1;
-        %     reward_2 = 1;
-        % elseif terminate == 2
-        %     reward_1 = -1;
-        %     reward_2 = -1;
-        % end
 
         %% calculating v_{t}
 
@@ -248,43 +232,6 @@ for episode = 1 : max_episode
         Fuzzy_critic.weights(active_rules_1.act) = v_weighted (: , 2);
 
         V_s_1 (2) = fuzzy_engine_3 ( [position_agent(iteration , 1) , position_agent(iteration , 2) , position_agent(iteration , 3)] , Fuzzy_critic ).res;
-
-        %% calculating v_{t}
-
-        % matrix_G = G_extractor (critic , active_rules_1 , angle_list);
-        % 
-        % V_s_1 = zeros (number_of_angle , 2);
-        % 
-        % if angle == 1
-        % 
-        %     ang_list = [1 2];
-        % 
-        % elseif angle == number_of_angle
-        % 
-        %     ang_list = [number_of_angle number_of_angle-1];
-        % 
-        % else
-        % 
-        %     ang_list = [angle , angle - 1 , angle + 1];
-        % 
-        % end
-        % 
-        % 
-        % for i = ang_list
-        % 
-        %     Fuzzy_critic.weights = zeros (number_of_rules , 1);
-        % 
-        %     Fuzzy_critic.weights(active_rules_1.act , 1) = matrix_G (: , 1 , i);
-        % 
-        %     V_s_1 (i , 1) = fuzzy_engine_3 ( [position_agent(iteration , 1) , position_agent(iteration  , 2) , position_agent(iteration  , 3)] , Fuzzy_critic ).res;
-        % 
-        %     Fuzzy_critic.weights = zeros (number_of_rules , 1);
-        % 
-        %     Fuzzy_critic.weights(active_rules_1.act , 1) = matrix_G (: , 2 , i);
-        % 
-        %     V_s_1 (i , 2) = fuzzy_engine_3 ( [position_agent(iteration , 1) , position_agent(iteration , 2) , position_agent(iteration , 3)] , Fuzzy_critic ).res;
-        % 
-        % end
         
         
         %% calculating v_{t+1}
@@ -367,10 +314,6 @@ for episode = 1 : max_episode
                 critic(rule).index = [critic(rule).index ; 0];
 
                 critic(rule).crowding_distance = [critic(rule).crowding_distance ; 0];
-                
-                % if critic(rule).index(critic(rule).selected) == 1
-                %     break
-                % end
 
             end
 
@@ -391,12 +334,6 @@ for episode = 1 : max_episode
 
             critic(rule).minimum_members = min_member;
             critic(rule).minimum_pareto = min_pareto;
-
-            % critic(rule).minimum_members = min (critic(rule).minimum_members , min_member);
-            % critic(rule).minimum_pareto = min (critic(rule).minimum_pareto , min_pareto);
-
-            % critic(rule).minimum_members = (1 - 0.01)* critic(rule).minimum_members + 0.01 * min_member;
-            % critic(rule).minimum_pareto = (1 - 0.01)* critic(rule).minimum_pareto + 0.01 * min_pareto;
 
         end
     end
