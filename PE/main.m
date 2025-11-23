@@ -2,7 +2,7 @@ close all; clear; clc
 
 if isfolder('Figs'); rmdir("Figs","s"); end
 
-rng(145)
+rng(124)
 
 mkdir("Figs")
 %% simulation time parameters
@@ -27,7 +27,7 @@ speed = 5; % speed of the agent (units/sec)
 
 position_goal = [40 , 40];
 
-position_pit  = [40 , 10];
+position_pit  = [30 , 10];
 
 capture_radius = 3;
 
@@ -39,19 +39,19 @@ gama_data.capture_radius = capture_radius;
 
 %% hyper parameters
 
-actor_learning_rate = 0.05;
+actor_learning_rate = 0.5;
 
 critic_learning_rate = 0.05;
 
-discount_factor = 0.9;
+discount_factor = 0.5; % works with 0.9
 
-number_of_angle = 7;
+number_of_angle = 15;
 
-max_repo_member = 10;
+max_repo_member = 30;
 
 angle_list = linspace (0 , pi/2 , number_of_angle);
 
-sigma = 0.75;
+sigma = 0.8;
 
 %% algorithm parameters
 
@@ -59,7 +59,7 @@ number_of_objectives = 2;
 
 number_of_inputs = 3;
 
-number_of_membership_functions = 5;
+number_of_membership_functions = 7;
 
 number_of_rules = number_of_membership_functions ^ number_of_inputs;
 
@@ -128,9 +128,9 @@ test_count = 0;
 
 for episode = 1 : max_episode
 
-    % sigma = sigma * 10 ^ (log10(0.5)/max_episode);
-    % actor_learning_rate  = actor_learning_rate * 10 ^ (log10(0.5)/max_episode);
-    % critic_learning_rate = critic_learning_rate * 10 ^ (log10(0.5)/max_episode);
+    sigma = sigma * 10 ^ (log10(0.5)/max_episode);
+    % actor_learning_rate  = actor_learning_rate * 10 ^ (log10(0.1)/max_episode);
+    % critic_learning_rate = critic_learning_rate * 10 ^ (log10(0.1)/max_episode);
 
     terminate = 0;
     iteration = 0;
@@ -138,9 +138,9 @@ for episode = 1 : max_episode
     %% episode simulation
 
     position_agent = zeros (max_iteration , 3);
-    position_agent (1 , :) = [dimension * rand , dimension * rand , 2 * pi * rand - pi];
+    % position_agent (1 , :) = [dimension * rand , dimension * rand , 2 * pi * rand - pi];
 
-    % position_agent (1 , :) = [0 0 pi/4];
+    position_agent (1 , :) = [0 0 pi/4];
 
     tic
     while ~terminate && iteration < max_iteration
@@ -155,7 +155,7 @@ for episode = 1 : max_episode
 
         %% pre-processing the rule-base and exploration - exploitation (distance from origin) (ND is applyed before!)
         
-        if mod(iteration , 1) == 0 || iteration == 1
+        if mod(iteration , 2) == 0 || iteration == 1
             angle = randi ([1 number_of_angle]);
         end
 
@@ -254,6 +254,7 @@ for episode = 1 : max_episode
 
         end
 
+        % ang_list = 1:number_of_angle;
 
         for i = ang_list
 
@@ -297,13 +298,13 @@ for episode = 1 : max_episode
             
                 critic(rule).members = [critic(rule).members ; New_critics];
 
-                [R_x , R_y] = delta_direction_calculator(angle_list(i) , critic(rule).minimum_members , critic(rule).members(critic(rule).selected,:) , New_critics);
-                
-                R_1 = abs(R_x) / (abs(R_x) + abs(R_y));
-                R_2 = abs(R_y) / (abs(R_x) + abs(R_y));
+                % [R_x , R_y] = delta_direction_calculator(angle_list(i) , critic(rule).minimum_members , critic(rule).members(critic(rule).selected,:) , New_critics);
+                % 
+                % R_1 = abs(R_x) / (abs(R_x) + abs(R_y));
+                % R_2 = abs(R_y) / (abs(R_x) + abs(R_y));
 
                 New_actors = actor(rule).members(critic(rule).selected) +...
-                    2*actor_learning_rate * (up - u.res) *( Delta(i,1)* cos(angle_list(i)) + Delta(i,2) * sin(angle_list(i)) ) * active_rules_1.phi(firing_strength_counter);
+                    actor_learning_rate * (up - u.res) *( Delta(i,1)* cos(angle_list(i)) + Delta(i,2) * sin(angle_list(i)) ) * active_rules_1.phi(firing_strength_counter);
                 
                 dummy = Delta(i,:);
 

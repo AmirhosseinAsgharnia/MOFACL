@@ -1,6 +1,6 @@
 function pareto_test (critic , actor , episode )
 
-Rules = [76 81 82 87 62 63 64 59];
+Rules = [197 204 205 212 213 220 221 228 187];
 
 fig = figure('Visible','off');
 
